@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&quot;subprocess.run(stdout=PIPE) で大量出力をメモリバッファして肥大化&quot;</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; background: white;
+                    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #222; margin: 20px 0 10px; }
+        h2 { color: #0066cc; margin: 20px 0 10px; font-size: 1.2em; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+               font-family: 'Monaco', 'Courier New', monospace; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; }
+        .back a { color: #0066cc; }
+        .page-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .severity { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.75em;
+                   font-weight: bold; color: white; }
+        .severity-high { background: #cc3300; }
+        .severity-medium { background: #cc7700; }
+        .severity-low { background: #007700; }
+        .tag { display: inline-block; background: #e8f0ff; color: #0044aa; border-radius: 12px;
+               padding: 2px 10px; font-size: 0.8em; margin: 2px; border: 1px solid #c0d0f0; }
+        .source-badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.7em;
+                       font-weight: bold; color: white; margin-left: 6px; }
+        .source-personal { background: #0066cc; }
+        .source-web { background: #666666; }
+        .related-section { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .related-section h2 { color: #555; font-size: 1.1em; margin-bottom: 12px; }
+        .related-list { list-style: none; }
+        .related-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .related-list li:last-child { border-bottom: none; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; font-weight: bold; }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back"><a href="../">← インデックスに戻る</a></div>
+        <div class="page-meta">
+            <span>カテゴリ: <strong>python</strong></span>
+            <span class="severity severity-medium">medium</span>
+            <span class="source-badge source-personal">実体験</span>
+            <span class="tag">python</span> <span class="tag">subprocess</span> <span class="tag">memory</span> 
+        </div>
+        <h2>症状</h2>
+<p>Rust クローラーの出力を Python で受け取る処理で、<code>subprocess.run(stdout=PIPE)</code> を使ったところ
+クローラー終了まで全 JSONL 出力がメモリに蓄積し、1.6GB → 3GB 超まで膨れた。
+DuckDB への書き込みもその後まとめて行うため、ピーク時は DB 処理とバッファが共存した。</p>
+<h2>原因</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ❌ 悪いパターン</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">RUST_CRAWLER</span><span class="p">),</span> <span class="s2">&quot;--file&quot;</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;--workers&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">workers</span><span class="p">)],</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>   <span class="c1"># 全出力を subprocess.CompletedProcess.stdout に蓄積</span>
+    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># ← ここで初めて1行ずつ処理</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">_write_pages_to_db</span><span class="p">([(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])],</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>subprocess.run</code> はプロセス終了まで全 stdout をバッファに保持する。
+クローラーが 19 ページ分の JSONL を出力し終わるまで、その全データが Python プロセスメモリに乗り続ける。</p>
+<h2>解決策</h2>
+<p><code>subprocess.Popen</code> + <code>proc.stdout</code> イテレーションで1行ずつストリーム処理：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ✅ 正しいパターン</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">RUST_CRAWLER</span><span class="p">),</span> <span class="s2">&quot;--file&quot;</span><span class="p">,</span> <span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;--workers&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">workers</span><span class="p">)],</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">stderr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># stderr は subprocess から直接端末へ</span>
+    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">bufsize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>     <span class="c1"># 行バッファリング</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>           <span class="c1"># 1行ずつ受け取り → 即 DB 書き込み</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">MAX_TEXT_CHARS</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="n">MAX_TEXT_CHARS</span><span class="p">]</span>   <span class="c1"># 巨大ページのトリムも忘れずに</span>
+    <span class="n">_write_pages_to_db</span><span class="p">([(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span> <span class="n">text</span><span class="p">)],</span> <span class="o">...</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+<span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+</code></pre></div>
+
+<p>DB 接続を1つ共有して行ごとに使い回す（<code>conn=conn</code> を渡す）ことで、接続オーバーヘッドも削減。</p>
+<h2>予防</h2>
+<ul>
+<li>外部プロセスの出力量が事前に分からない場合は <code>subprocess.Popen</code> + イテレーション</li>
+<li><code>subprocess.run(stdout=PIPE)</code> はログ収集など「小さい出力が確実」な用途に限定する</li>
+<li>1 ページあたりのテキスト上限（<code>MAX_TEXT_CHARS</code>）を設けてサイズ爆発を防ぐ</li>
+</ul>
+                <div class="related-section">
+            <h2>関連するエラー</h2>
+            <ul class="related-list">
+                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
+                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
+                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

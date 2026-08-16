@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&quot;WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可&quot;</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; background: white;
+                    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #222; margin: 20px 0 10px; }
+        h2 { color: #0066cc; margin: 20px 0 10px; font-size: 1.2em; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+               font-family: 'Monaco', 'Courier New', monospace; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; }
+        .back a { color: #0066cc; }
+        .page-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .severity { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.75em;
+                   font-weight: bold; color: white; }
+        .severity-high { background: #cc3300; }
+        .severity-medium { background: #cc7700; }
+        .severity-low { background: #007700; }
+        .tag { display: inline-block; background: #e8f0ff; color: #0044aa; border-radius: 12px;
+               padding: 2px 10px; font-size: 0.8em; margin: 2px; border: 1px solid #c0d0f0; }
+        .source-badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.7em;
+                       font-weight: bold; color: white; margin-left: 6px; }
+        .source-personal { background: #0066cc; }
+        .source-web { background: #666666; }
+        .related-section { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .related-section h2 { color: #555; font-size: 1.1em; margin-bottom: 12px; }
+        .related-list { list-style: none; }
+        .related-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .related-list li:last-child { border-bottom: none; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; font-weight: bold; }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back"><a href="../">← インデックスに戻る</a></div>
+        <div class="page-meta">
+            <span>カテゴリ: <strong>system</strong></span>
+            <span class="severity severity-high">high</span>
+            <span class="source-badge source-personal">実体験</span>
+            <span class="tag">wsl2</span> <span class="tag">portproxy</span> <span class="tag">ollama</span> <span class="tag">windows</span> <span class="tag">mirrored-networking</span> 
+        </div>
+        <h2>症状</h2>
+<p>DS1 で Ollama が WSL2 内で "address already in use" で起動失敗。
+LAN から <internal-ip>:11434 に TCP は繋がるが HTTP はコネクションリセット。</p>
+<h2>原因</h2>
+<p><code>netsh interface portproxy add v4tov4 listenport=11434 connectaddress=127.0.0.1</code> を設定すると、
+mirrored networking モードでは Windows の svchost(iphlpsvc) が先に <code>0.0.0.0:11434</code> を確保する。
+WSL2 から見た 127.0.0.1:11434 も同じ network namespace のため、Ollama が bind できない。</p>
+<h2>解決策</h2>
+<p><strong>mirrored networking で Ollama が直接 0.0.0.0:11434 をリッスンするサービスには portproxy を設定しない。</strong></p>
+<p><code>netsh interface portproxy delete v4tov4 listenport=11434 listenaddress=0.0.0.0</code></p>
+<p>その後 Ollama を再起動すれば LAN から直接アクセス可能になる。</p>
+<h2>予防</h2>
+<p><code>scripts/ds1/setup-portproxy.ps1</code> から port 11434 を除外済み。
+mirrored networking 環境では WSL2 サービスが <code>0.0.0.0</code> で bind するポートには portproxy 不要。
+portproxy が必要なのは NAT モード時か、ポート変換（2222→22 など）が必要な場合のみ。</p>
+                <div class="related-section">
+            <h2>関連するエラー</h2>
+            <ul class="related-list">
+                <li><a href="../system/windows-firewall-blocks-docker-ports.html">&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;</a></li>
+                <li><a href="../system/wsl2-mirrored-networking-portproxy-conflict.html">&quot;WSL2 mirrored networking で portproxy を使うと connection reset になる&quot;</a></li>
+                <li><a href="../system/wsl2-ssh-path-empty.html">&quot;WSL2 SSH セッションで PATH が空になり sudo/docker 等が見つからない&quot;</a></li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>
