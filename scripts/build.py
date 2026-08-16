@@ -281,7 +281,7 @@ def build():
 </html>
 """
 
-    (build_dir / "index.html").write_text(index_html)
+    (build_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     # 各 Markdown ファイルを HTML に変換
     for error in errors:
