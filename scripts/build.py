@@ -5,11 +5,35 @@ Markdown エラー記録を HTML に変換して GitHub Pages 用に出力
 """
 import os
 import re
+import json
 import html
 import markdown
+import bleach
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Tuple
+
+# markdown レンダリング結果のサニタイズ許可リスト（外部 PR 由来の生 HTML/script を除去）
+ALLOWED_TAGS = [
+    "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
+    "code", "pre", "a", "strong", "em", "b", "i", "blockquote",
+    "table", "thead", "tbody", "tr", "th", "td", "hr", "br",
+    "span", "div", "img",
+]
+ALLOWED_ATTRS = {
+    "a": ["href", "title"],
+    "img": ["src", "alt", "title"],
+    "span": ["class"],
+    "div": ["class"],
+    "pre": ["class"],
+    "code": ["class"],
+    "table": ["class"],
+}
+
+
+def js_string(value: str) -> str:
+    """HTML 属性内の JS 文字列リテラルとして安全に埋め込む（onclick 等）。"""
+    return html.escape(json.dumps(value))
 
 def parse_frontmatter(text: str) -> Tuple[Dict, str]:
     """frontmatter を YAML 形式で抽出（--- で囲まれた部分）"""
@@ -178,7 +202,7 @@ def build():
 
     # タグフィルタボタンを生成
     for tag in all_tags:
-        index_html += f'            <span class="tag" onclick="filterByTag(this, {repr(tag)})">{html.escape(tag)}</span>\n'
+        index_html += f'            <span class="tag" onclick="filterByTag(this, {js_string(tag)})">{html.escape(tag)}</span>\n'
 
     index_html += '            <span class="tag" onclick="filterByTag(this, \'ALL\')" style="background:#eee">すべて</span>\n'
     index_html += '        </div>\n'
@@ -221,7 +245,7 @@ def build():
 
                 if error.get('tags'):
                     for tag in error['tags']:
-                        index_html += f'                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, {repr(tag)})">{html.escape(tag)}</span>\n'
+                        index_html += f'                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, {js_string(tag)})">{html.escape(tag)}</span>\n'
 
                 index_html += '            </div>\n'
 
@@ -292,6 +316,13 @@ def build():
         html_content = markdown.markdown(
             error['body_md'],
             extensions=['tables', 'fenced_code', 'codehilite']
+        )
+        # 外部 PR 由来の生 HTML/script を除去（stored XSS 対策）
+        html_content = bleach.clean(
+            html_content,
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRS,
+            strip=True,
         )
 
         # 関連エラーを取得
