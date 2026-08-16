@@ -51,20 +51,37 @@
 
         <div id="tag-filter">
             <span id="filter-label">タグで絞り込み：</span>
+            <span class="tag" onclick="filterByTag(this, 'arc')">arc</span>
             <span class="tag" onclick="filterByTag(this, 'async')">async</span>
             <span class="tag" onclick="filterByTag(this, 'browser-navigation')">browser-navigation</span>
             <span class="tag" onclick="filterByTag(this, 'bundling')">bundling</span>
             <span class="tag" onclick="filterByTag(this, 'cache')">cache</span>
+            <span class="tag" onclick="filterByTag(this, 'ci')">ci</span>
+            <span class="tag" onclick="filterByTag(this, 'cli')">cli</span>
             <span class="tag" onclick="filterByTag(this, 'configuration')">configuration</span>
             <span class="tag" onclick="filterByTag(this, 'css')">css</span>
+            <span class="tag" onclick="filterByTag(this, 'doc-ingest')">doc-ingest</span>
             <span class="tag" onclick="filterByTag(this, 'esm')">esm</span>
+            <span class="tag" onclick="filterByTag(this, 'fixtures')">fixtures</span>
+            <span class="tag" onclick="filterByTag(this, 'git')">git</span>
+            <span class="tag" onclick="filterByTag(this, 'github-actions')">github-actions</span>
+            <span class="tag" onclick="filterByTag(this, 'gitignore')">gitignore</span>
+            <span class="tag" onclick="filterByTag(this, 'helm')">helm</span>
+            <span class="tag" onclick="filterByTag(this, 'husky')">husky</span>
+            <span class="tag" onclick="filterByTag(this, 'kubernetes')">kubernetes</span>
+            <span class="tag" onclick="filterByTag(this, 'lint-staged')">lint-staged</span>
             <span class="tag" onclick="filterByTag(this, 'module-resolution')">module-resolution</span>
             <span class="tag" onclick="filterByTag(this, 'multi-file')">multi-file</span>
             <span class="tag" onclick="filterByTag(this, 'named-export')">named-export</span>
             <span class="tag" onclick="filterByTag(this, 'nextjs')">nextjs</span>
+            <span class="tag" onclick="filterByTag(this, 'ollama')">ollama</span>
             <span class="tag" onclick="filterByTag(this, 'postcss')">postcss</span>
+            <span class="tag" onclick="filterByTag(this, 'pre-commit')">pre-commit</span>
+            <span class="tag" onclick="filterByTag(this, 'pytest')">pytest</span>
+            <span class="tag" onclick="filterByTag(this, 'python')">python</span>
             <span class="tag" onclick="filterByTag(this, 'react')">react</span>
             <span class="tag" onclick="filterByTag(this, 'state-management')">state-management</span>
+            <span class="tag" onclick="filterByTag(this, 'submodule')">submodule</span>
             <span class="tag" onclick="filterByTag(this, 'tailwind')">tailwind</span>
             <span class="tag" onclick="filterByTag(this, 'typescript')">typescript</span>
             <span class="tag" onclick="filterByTag(this, 'v4')">v4</span>
@@ -73,6 +90,19 @@
         </div>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
         <h2 style="margin: 30px 0 15px; color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">🎯 実体験</h2>
+        <div class="category">
+            <h3>📁 DEPLOYMENT</h3>
+            <div class="error-card" data-tags="kubernetes,helm,arc,github-actions,ci" data-title="&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;" data-text="ARC runner scale set: user-level githubConfigUrl で 404 症状 AutoscalingRunnerSet の listener pod が起動しない。 原因 (user/org-level) を指定すると、 ARC 0.14.2 が API を叩く。 個人アカウント（Organization 未作成）の場合、 エンドポイントは 404。 GitHub は user-level self-hosted runner を で提供しているが、 ARC 0.14.2 はこのエンドポイントを使わず に固定している。 解決策 を **repo-level*に変更する: runner は指定リポジトリ専用になる。複数リポジトリで共有するには、 Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。 回避策 Organization を作成し、org-level URL ( ) を使う。 org スコープ runner は全リポジトリで共有可能。 関連 ARC version: 0.14.2">
+                <a href="deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a>
+                <span class="severity severity-medium">medium</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'kubernetes')">kubernetes</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'helm')">helm</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'arc')">arc</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'github-actions')">github-actions</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'ci')">ci</span>
+            </div>
+        </div>
         <div class="category">
             <h3>📁 JAVASCRIPT</h3>
             <div class="error-card" data-tags="nextjs,react,state-management,browser-navigation,async" data-title="&quot;Next.js: Browser back button causes infinite loading state&quot;" data-text="Next.js: ブラウザ戻るボタンで無限ローディング状態 症状 詳細ページからダッシュボードに戻るときにブラウザの戻るボタンを使用すると、ページが無限ローディング状態のままハングする。F5（完全リロード）を押すまで応答しない。 原因 ✅ **マウント/アンマウント時のレースコンディション*ブラウザ戻るボタン使用時に、コンポーネント破棄と非同期処理の完了タイミングがズレる ✅ **アンマウント後の状態更新試行*破棄されたコンポーネントに対して state を設定しようとする ✅ **メモリリーク：クローズされない Promise*fetch 完了後の state 更新が pending のまま残る ✅ **cleanup 欠落*useEffect で適切に cleanup 関数を定義していない 解決策 1. DecisionLogList Component に を追加 2. Timeout 機構で強制的にローディングを終了 3. useAuth Hook で isMounted フラグを使用 4. AbortController で fetch をキャンセル（推奨） 予防 [ ] *">
@@ -122,8 +152,49 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'module-resolution')">module-resolution</span>
             </div>
         </div>
+        <div class="category">
+            <h3>📁 OTHER</h3>
+            <div class="error-card" data-tags="git,lint-staged,husky,pre-commit" data-title="&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;" data-text="lint-staged: stash/pop でブランチが意図せず切り替わる 症状 ブランチでコミット後、カレントブランチが に戻っていた。 その後 が しか表示しない。 原因 lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、 異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。 解決策 影響を受けたブランチのファイルは で参照する: 根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。 予防 コミット直後は で正しいブランチにいるか確認する。">
+                <a href="other/lint-staged-stash-branch-switch.html">&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</a>
+                <span class="severity severity-medium">medium</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'git')">git</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'lint-staged')">lint-staged</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'husky')">husky</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'pre-commit')">pre-commit</span>
+            </div>
+            <div class="error-card" data-tags="git,submodule,ci,gitignore" data-title="&quot;self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗&quot;" data-text="git: .gitmodules なしのサブモジュールで CI 全ジョブ失敗 症状 CI の全ジョブが以下で失敗。 gitleaks / actionlint / auto-fix の全ジョブが同時にコケた。 原因 auto-commit hook が （独立した git リポジトリ）を誤って し、 エントリなしのサブモジュールとして commits に記録してしまった。 解決策 その後 に を追加してコミット。 予防 独立 git リポジトリを持つディレクトリは事前に に登録する auto-commit hook がある場合は で が含まれていないか確認してから実行">
+                <a href="other/self-data-submodule-without-gitmodules.html">&quot;self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗&quot;</a>
+                <span class="severity severity-high">high</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'git')">git</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'submodule')">submodule</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'ci')">ci</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'gitignore')">gitignore</span>
+            </div>
+        </div>
+        <div class="category">
+            <h3>📁 PYTHON</h3>
+            <div class="error-card" data-tags="python,ollama,doc-ingest,cli" data-title="&quot;Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった&quot;" data-text="Ollama HTTP 404: --model デフォルトが Anthropic モデル名 症状 実行時に Ollama から HTTP 404 が返り蒸留が失敗。 原因 の 引数のデフォルト値が になっており、Ollama に存在しないモデル名が渡されていた。 解決策 の デフォルトを に変更。 環境変数（例: ）が Ollama 側のモデル選択に使われる。 予防 Ollama と Anthropic で異なるモデル名体系であることを意識する は Anthropic フォールバック専用とし、Ollama 側は env var で制御する設計を維持">
+                <a href="python/ollama-404-wrong-default-model.html">&quot;Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった&quot;</a>
+                <span class="severity severity-medium">medium</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'python')">python</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'ollama')">ollama</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'doc-ingest')">doc-ingest</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'cli')">cli</span>
+            </div>
+            <div class="error-card" data-tags="pytest,python,fixtures" data-title="&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;" data-text="pytest: Fixture called directly エラー 症状 原因 で定義した関数を のように直接呼び出した。 pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。 解決策 テスト関数のパラメーターとして受け取る: 外部パッケージが提供する fixture ( 等) は プロジェクトの で として pytest に認識させる必要がある。 予防 fixture のテストは直接呼び出しで動作確認しようとしない パッケージ提供 fixture は必ず で re-export する">
+                <a href="python/pytest-fixture-called-directly.html">&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</a>
+                <span class="severity severity-low">low</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'pytest')">pytest</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'python')">python</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, 'fixtures')">fixtures</span>
+            </div>
+        </div>
         <footer>
-            <p>Last updated: 2026-04-27 12:36:12</p>
+            <p>Last updated: 2026-08-16 11:50:37</p>
             <p><a href="https://github.com/flipslidersand/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
