@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</title>
+    <title>&quot;GitHub個人アカウントはorg-level self-hosted runner登録不可（404）&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -48,45 +48,54 @@
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
             <span>カテゴリ: <strong>deployment</strong></span>
-            <span class="severity severity-medium">medium</span>
+            <span class="severity severity-high">high</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">kubernetes</span> <span class="tag">helm</span> <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">ci</span> 
+            <span class="tag">github-actions</span> <span class="tag">arc</span> <span class="tag">self-hosted-runner</span> <span class="tag">organization</span> 
         </div>
-        <h1>ARC runner scale set: user-level githubConfigUrl で 404</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code><span class="nl">error:</span><span class="w"> </span><span class="n">failed</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">runner</span><span class="w"> </span><span class="n">registration</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="nl">refresh:</span>
-<span class="w">  </span><span class="n">request</span><span class="w"> </span><span class="n">POST</span><span class="w"> </span><span class="nl">https:</span><span class="c1">//api.github.com/orgs/&lt;username&gt;/actions/runners/registration-token</span>
-<span class="w">  </span><span class="n">failed</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s">&quot;404 Not Found&quot;</span><span class="p">)</span>
+        <h2>症状</h2>
+<p>ARC (Actions Runner Controller) の <code>githubConfigUrl</code> を
+<code>https://github.com/&lt;username&gt;</code> (個人アカウント) に変更したところ、
+AutoscalingListener が以下のエラーでcrash loopした。</p>
+<div class="codehilite"><pre><span></span><code><span class="n">failed</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">create</span><span class="w"> </span><span class="n">runner</span><span class="w"> </span><span class="n">registration</span><span class="w"> </span><span class="n">token</span>
+<span class="n">POST</span><span class="w"> </span><span class="nl">https:</span><span class="c1">//api.github.com/orgs/flipslidersand/actions/runners/registration-token</span>
+<span class="err">→</span><span class="w"> </span><span class="mh">404</span><span class="w"> </span><span class="n">Not</span><span class="w"> </span><span class="n">Found</span>
 </code></pre></div>
 
-<p>AutoscalingRunnerSet の listener pod が起動しない。</p>
 <h2>原因</h2>
-<p><code>githubConfigUrl: https://github.com/&lt;username&gt;</code> (user/org-level) を指定すると、
-ARC 0.14.2 が <code>/orgs/&lt;username&gt;/actions/runners/registration-token</code> API を叩く。
-個人アカウント（Organization 未作成）の場合、<code>/orgs/</code> エンドポイントは 404。</p>
-<p>GitHub は user-level self-hosted runner を <code>/user/runners</code> で提供しているが、
-ARC 0.14.2 はこのエンドポイントを使わず <code>/orgs/</code> に固定している。</p>
+<p>GitHub の self-hosted runner registration token エンドポイントは
+<code>/orgs/{org}</code> パスを使うが、個人アカウント (<code>flipslidersand</code>) は
+GitHub Organization ではないため404が返る。</p>
+<p>個人アカウントがサポートするのはリポジトリレベルのランナーのみ
+(<code>/repos/{owner}/{repo}/actions/runners/registration-token</code>)。</p>
 <h2>解決策</h2>
-<p><code>githubConfigUrl</code> を <strong>repo-level</strong> に変更する:</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">githubConfigUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/&lt;username&gt;/&lt;repo-name&gt;</span>
-</code></pre></div>
-
-<p>runner は指定リポジトリ専用になる。複数リポジトリで共有するには、
-Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。</p>
-<h2>回避策</h2>
-<p>Organization を作成し、org-level URL (<code>https://github.com/&lt;org&gt;</code>) を使う。
-org スコープ runner は全リポジトリで共有可能。</p>
-<h2>関連</h2>
+<ol>
+<li><code>githubConfigUrl</code> をリポジトリレベルに戻す:</li>
+</ol>
+<p><code>yaml
+   githubConfigUrl: https://github.com/flipslidersand/dev-infrastructure</code></p>
+<ol>
+<li>crash loopしたARC resourcesをすべて削除してArgoCD再作成を待つ:
+   <code>bash
+   kubectl delete autoscalinglisteners -n arc-runners --all
+   # finalizer が残る場合
+   kubectl patch autoscalinglistener &lt;name&gt; -n arc-runners \
+     -p '{"metadata":{"finalizers":[]}}' --type=merge
+   kubectl delete autoscalingrunnerset arc-dev-nodee -n arc-runners --ignore-not-found
+   # ArgoCD が自動再作成（selfHeal: true）</code></li>
+</ol>
+<h2>予防</h2>
 <ul>
-<li>ARC version: 0.14.2 (gha-runner-scale-set chart)</li>
-<li>Epic #854 CI Compute Platform</li>
+<li>org-level ARC runner には <strong>GitHub Organization</strong> アカウントが必要</li>
+<li>個人アカウントで org-level 移行を計画している場合は
+  先に Organization を作成してから PAT スコープ <code>manage_runners:org</code> で設定する</li>
+<li>PAT には <code>Administration RW</code> + <code>manage_runners:org</code> の両方が必要</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
+                <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
                 <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
                 <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
-                <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
             </ul>
         </div>
 

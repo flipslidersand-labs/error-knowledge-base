@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -48,44 +48,50 @@
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
             <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">python</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
+        <h1>jina-embeddings-v2-base-code が transformers 5.x で ImportError</h1>
 <h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+<div class="codehilite"><pre><span></span><code><span class="ne">ImportError</span><span class="p">:</span> <span class="n">cannot</span> <span class="kn">import</span><span class="w"> </span><span class="nn">name</span> <span class="s1">&#39;find_pruneable_heads_and_indices&#39;</span> <span class="kn">from</span><span class="w"> </span><span class="s1">&#39;transformers.pytorch_utils&#39;</span>
 </code></pre></div>
 
-<h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
-<h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<p>または</p>
+<div class="codehilite"><pre><span></span><code><span class="nx">ValueError</span><span class="p">:</span><span class="w"> </span><span class="nx">Specified</span><span class="w"> </span><span class="err">`</span><span class="nx">attn_implementation</span><span class="p">=</span><span class="s">&quot;torch&quot;</span><span class="err">`</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="nx">supported</span><span class="p">.</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
+<h2>環境</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li><code>transformers &gt;= 5.0</code> (確認: 5.12.1)</li>
+<li><code>sentence-transformers &gt;= 5.0</code></li>
+<li><code>jinaai/jina-embeddings-v2-base-code</code></li>
+</ul>
+<h2>原因</h2>
+<p>jina-v2 の custom code (<code>modeling_bert.py</code>) が <code>transformers.pytorch_utils</code> から
+<code>find_pruneable_heads_and_indices</code> をインポートしているが、transformers 5.x で削除された。
+また model config に <code>attn_implementation="torch"</code> が設定されているが、これも 5.x 非対応。</p>
+<h2>解決策</h2>
+<p><code>microsoft/codebert-base</code> (768-d) に差し替える。同じ 768-d でコード意味理解に特化。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Before</span>
+<span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;jinaai/jina-embeddings-v2-base-code&quot;</span>
+
+<span class="c1"># After</span>
+<span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;microsoft/codebert-base&quot;</span>
+</code></pre></div>
+
+<h2>試したが効かなかった方法</h2>
+<ul>
+<li><code>trust_remote_code=True</code> → find_pruneable_heads_and_indices エラーは残る</li>
+<li><code>model_kwargs={'attn_implementation': 'eager'}</code> → 同上</li>
+<li><code>jinaai/jina-embeddings-v3</code> → <code>einops</code> パッケージ不足で別エラー</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
                 <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
                 <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../python/ollama-404-wrong-default-model.html">&quot;Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった&quot;</a></li>
             </ul>
         </div>
 

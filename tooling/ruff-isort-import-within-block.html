@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;ruff I001: from import ブロック内の名前順序違反&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,51 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
+            <span>カテゴリ: <strong>tooling</strong></span>
             <span class="severity severity-low">low</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">ruff</span> <span class="tag">isort</span> <span class="tag">python</span> <span class="tag">ci</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+        <h2>症状</h2>
+<p>CI の lint ステップ（<code>ruff check</code>）が以下で失敗:</p>
+<div class="codehilite"><pre><span></span><code>tests/test_jobs.py:11:1: I001 Import block is un-sorted or un-formatted
 </code></pre></div>
 
+<p><code>from academic_paper.db import (...)</code> ブロック内で <code>upsert_job</code> を <code>update_paper_status</code> より前に書いた。</p>
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>ruff の <code>I</code> ルール（isort 準拠）は <code>from X import (a, b, c)</code> ブロック内の名前も<strong>アルファベット順</strong>を要求する。</p>
+<p><code>u</code> で始まる2名前の比較:</p>
+<ul>
+<li><code>update_paper_status</code> → <code>u-p-d...</code></li>
+<li><code>upsert_job</code> → <code>u-p-s...</code></li>
+</ul>
+<p><code>'d' &lt; 's'</code> なので <code>update_paper_status</code> が先でなければならない。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">academic_paper.db</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">upsert_job</span><span class="p">,</span>
+    <span class="n">update_paper_status</span><span class="p">,</span>  <span class="c1"># &#39;d&#39; &lt; &#39;s&#39; なので後に来てはいけない</span>
+<span class="p">)</span>
 
 <span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">academic_paper.db</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">update_paper_status</span><span class="p">,</span>
+    <span class="n">upsert_job</span><span class="p">,</span>
+<span class="p">)</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
 <h2>予防</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>複数関数を <code>from X import (...)</code> でまとめる際は常にアルファベット順に並べる</li>
+<li>ローカルで <code>ruff check --fix</code> を実行してから push すると自動修正される</li>
+<li>同じ頭文字の名前が混在する場合は2〜3文字目まで比較する習慣をつける</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../ci/arc-org-404-listener-crashloop.html">&quot;ARC listener crash loop — org-level 404 / scale set ID 不一致&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
+                <li><a href="../other/self-data-submodule-without-gitmodules.html">&quot;self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗&quot;</a></li>
             </ul>
         </div>
 

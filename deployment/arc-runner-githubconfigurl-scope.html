@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</title>
+    <title>&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -48,44 +48,53 @@
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
             <span>カテゴリ: <strong>deployment</strong></span>
-            <span class="severity severity-medium">medium</span>
+            <span class="severity severity-high">high</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">kubernetes</span> <span class="tag">helm</span> <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">ci</span> 
+            <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">kubernetes</span> <span class="tag">runner</span> 
         </div>
-        <h1>ARC runner scale set: user-level githubConfigUrl で 404</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code><span class="nl">error:</span><span class="w"> </span><span class="n">failed</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">runner</span><span class="w"> </span><span class="n">registration</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="nl">refresh:</span>
-<span class="w">  </span><span class="n">request</span><span class="w"> </span><span class="n">POST</span><span class="w"> </span><span class="nl">https:</span><span class="c1">//api.github.com/orgs/&lt;username&gt;/actions/runners/registration-token</span>
-<span class="w">  </span><span class="n">failed</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s">&quot;404 Not Found&quot;</span><span class="p">)</span>
-</code></pre></div>
-
-<p>AutoscalingRunnerSet の listener pod が起動しない。</p>
+        <h2>症状</h2>
+<p><code>runs-on: arc-knowledge-db</code> の GitHub Actions ジョブが queued のまま実行されない。
+ARC listener ログでは <code>assigned job=0, decision=0</code> がループし続ける。</p>
 <h2>原因</h2>
-<p><code>githubConfigUrl: https://github.com/&lt;username&gt;</code> (user/org-level) を指定すると、
-ARC 0.14.2 が <code>/orgs/&lt;username&gt;/actions/runners/registration-token</code> API を叩く。
-個人アカウント（Organization 未作成）の場合、<code>/orgs/</code> エンドポイントは 404。</p>
-<p>GitHub は user-level self-hosted runner を <code>/user/runners</code> で提供しているが、
-ARC 0.14.2 はこのエンドポイントを使わず <code>/orgs/</code> に固定している。</p>
-<h2>解決策</h2>
-<p><code>githubConfigUrl</code> を <strong>repo-level</strong> に変更する:</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">githubConfigUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/&lt;username&gt;/&lt;repo-name&gt;</span>
+<p>ARC runner scale set の <code>githubConfigUrl</code> は登録先リポジトリ/org を決定する。
+<code>arc-dev-nodee</code> は <code>flipslidersand/dev-nodee-infrastructure</code> に登録されているため、
+<code>yukilabs-core/knowledge-db</code> のジョブは dispatch されない。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 誤り：flipslidersand 専用ランナーを yukilabs-core ワークフローで指定</span>
+<span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arc-dev-nodee</span><span class="w"> </span><span class="c1"># -&gt; flipslidersand/dev-nodee-infrastructure にしか届かない</span>
 </code></pre></div>
 
-<p>runner は指定リポジトリ専用になる。複数リポジトリで共有するには、
-Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。</p>
-<h2>回避策</h2>
-<p>Organization を作成し、org-level URL (<code>https://github.com/&lt;org&gt;</code>) を使う。
-org スコープ runner は全リポジトリで共有可能。</p>
-<h2>関連</h2>
+<p>さらに <code>arc-knowledge-db</code> ランナーを新設しても <code>githubConfigSecret</code> に
+<code>yukilabs-core</code> アクセス可能なトークンが必要（既存の flipslidersand PAT は pull 権限のみ）。</p>
+<h2>解決策</h2>
+<ol>
+<li><code>yukilabs-core</code> 専用シークレットを作成:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="nv">YUKI_TOKEN</span><span class="o">=</span><span class="k">$(</span>gh<span class="w"> </span>auth<span class="w"> </span>token<span class="w"> </span>--user<span class="w"> </span>yukilabs-core<span class="k">)</span>
+kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>arc-knowledge-db-github-secret<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-n<span class="w"> </span>arc-runners<span class="w"> </span>--from-literal<span class="o">=</span><span class="nv">github_token</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">YUKI_TOKEN</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<ol>
+<li>ArgoCD Application manifest で専用シークレットを参照:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="nt">githubConfigSecret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arc-knowledge-db-github-secret</span>
+</code></pre></div>
+
+<ol>
+<li>全ワークフローの <code>runs-on</code> を <code>arc-knowledge-db</code> に統一。</li>
+</ol>
+<h2>予防</h2>
 <ul>
-<li>ARC version: 0.14.2 (gha-runner-scale-set chart)</li>
-<li>Epic #854 CI Compute Platform</li>
+<li>org をまたぐ場合は必ず別 runner scale set + 別シークレットを作成する</li>
+<li><code>githubConfigUrl</code> に設定したリポジトリ以外のジョブは絶対に届かない</li>
+<li>runner scale set 登録後に <code>gh api repos/&lt;org&gt;/&lt;repo&gt;/actions/runners</code> で確認
+  （ARC v2 は旧 API に出ないが 0 なら未登録の可能性あり）</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
                 <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
                 <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
             </ul>
         </div>

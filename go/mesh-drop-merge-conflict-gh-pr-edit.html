@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</title>
+    <title>&quot;gh pr edit が Projects (classic) 警告で exit 1 になる&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,32 +47,41 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>other</strong></span>
+            <span>カテゴリ: <strong>go</strong></span>
             <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">git</span> <span class="tag">lint-staged</span> <span class="tag">husky</span> <span class="tag">pre-commit</span> 
+            <span class="tag">go</span> 
         </div>
-        <h1>lint-staged: stash/pop でブランチが意図せず切り替わる</h1>
+        <h1>gh pr edit が Projects (classic) 警告で exit 1 になる</h1>
 <h2>症状</h2>
-<p><code>feat/doc-ingest-pipeline</code> ブランチでコミット後、カレントブランチが
-<code>perf/round11-optimizations</code> に戻っていた。
-その後 <code>ls scripts/doc_ingest/</code> が <code>__pycache__</code> しか表示しない。</p>
-<h2>原因</h2>
-<p>lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、
-異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。</p>
-<h2>解決策</h2>
-<p>影響を受けたブランチのファイルは <code>git show &lt;branch&gt;:&lt;path&gt;</code> で参照する:</p>
-<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>show<span class="w"> </span>feat/doc-ingest-pipeline:scripts/doc_ingest/cli.py
+<div class="codehilite"><pre><span></span><code><span class="nv">gh</span><span class="w"> </span><span class="nv">pr</span><span class="w"> </span><span class="nv">edit</span><span class="w"> </span><span class="mi">198</span><span class="w"> </span><span class="o">--</span><span class="nv">repo</span><span class="w"> </span>...<span class="w"> </span><span class="o">--</span><span class="nv">title</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="o">--</span><span class="nv">body</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+<span class="nv">GraphQL</span>:<span class="w"> </span><span class="nv">Projects</span><span class="w"> </span><span class="ss">(</span><span class="nv">classic</span><span class="ss">)</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">being</span><span class="w"> </span><span class="nv">deprecated</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">favor</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">new</span><span class="w"> </span><span class="nv">Projects</span><span class="w"> </span><span class="nv">experience</span>
+<span class="k">exit</span>:<span class="w"> </span><span class="mi">1</span>
 </code></pre></div>
 
-<p>根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。</p>
-<h2>予防</h2>
-<p>コミット直後は <code>git branch --show-current</code> で正しいブランチにいるか確認する。</p>
+<p>タイトル・本文は実際には更新されていない（API呼び出し自体が失敗している）。</p>
+<h2>原因</h2>
+<p><code>gh pr edit</code> が Projects (classic) フィールドを取得する GraphQL クエリを内部で投げており、
+deprecation エラーが返ってくると exit 1 になる。</p>
+<h2>回避策</h2>
+<p>REST API を直接叩く:</p>
+<div class="codehilite"><pre><span></span><code>gh<span class="w"> </span>api<span class="w"> </span>--method<span class="w"> </span>PATCH<span class="w"> </span>repos/&lt;owner&gt;/&lt;repo&gt;/pulls/&lt;number&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--field<span class="w"> </span><span class="nv">title</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--field<span class="w"> </span><span class="nv">body</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--jq<span class="w"> </span><span class="s1">&#39;.number,.title&#39;</span>
+</code></pre></div>
+
+<h2>確認環境</h2>
+<ul>
+<li>gh version: 2.x</li>
+<li>発生リポ: flipslidersand-labs/mesh-drop</li>
+<li>日付: 2026-08-16</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../tooling/worktree-husky-lint-staged-missing.html">&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;</a></li>
-                <li><a href="../github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a></li>
+                <li><a href="../go/bench-deadlock-defer-cleanup-drain.html">&quot;Go benchmark: defer cleanup() でドレイン goroutine がデッドロック&quot;</a></li>
+                <li><a href="../go/mesh-drop-branch-diverge-port.html">&quot;master から分岐したブランチへの機能ポート手順&quot;</a></li>
                 <li><a href="../go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a></li>
             </ul>
         </div>

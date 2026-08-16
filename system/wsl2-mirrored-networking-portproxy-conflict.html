@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&quot;WSL2 mirrored networking で portproxy を使うと connection reset になる&quot;</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; background: white;
+                    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #222; margin: 20px 0 10px; }
+        h2 { color: #0066cc; margin: 20px 0 10px; font-size: 1.2em; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+               font-family: 'Monaco', 'Courier New', monospace; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; }
+        .back a { color: #0066cc; }
+        .page-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .severity { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.75em;
+                   font-weight: bold; color: white; }
+        .severity-high { background: #cc3300; }
+        .severity-medium { background: #cc7700; }
+        .severity-low { background: #007700; }
+        .tag { display: inline-block; background: #e8f0ff; color: #0044aa; border-radius: 12px;
+               padding: 2px 10px; font-size: 0.8em; margin: 2px; border: 1px solid #c0d0f0; }
+        .source-badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.7em;
+                       font-weight: bold; color: white; margin-left: 6px; }
+        .source-personal { background: #0066cc; }
+        .source-web { background: #666666; }
+        .related-section { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .related-section h2 { color: #555; font-size: 1.1em; margin-bottom: 12px; }
+        .related-list { list-style: none; }
+        .related-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .related-list li:last-child { border-bottom: none; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; font-weight: bold; }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back"><a href="../">← インデックスに戻る</a></div>
+        <div class="page-meta">
+            <span>カテゴリ: <strong>system</strong></span>
+            <span class="severity severity-high">high</span>
+            <span class="source-badge source-personal">実体験</span>
+            <span class="tag">wsl2</span> <span class="tag">networking</span> <span class="tag">portproxy</span> <span class="tag">node_exporter</span> 
+        </div>
+        <h2>症状</h2>
+<p>WSL2 mirrored networking (<code>networkingMode=mirrored</code>) 環境で <code>netsh interface portproxy</code> を
+設定すると、以下の問題が発生する。</p>
+<ol>
+<li><strong>"address already in use"</strong>: portproxy が LAN IP:9100 でリッスンしており、
+   WSL2 内の node_exporter が同じポートをバインドできない（mirrored networking により
+   Windows と WSL2 は同一 IP を共有するため）</li>
+<li><strong>"connection reset"</strong>: portproxy が TCP 接続を受け入れるが、
+   WSL2 へのデータ転送で接続が切断される（原因不明だが再現性あり）</li>
+<li><strong>"empty reply"</strong>: <code>listenaddress=0.0.0.0</code> で portproxy を設定すると
+   127.0.0.1:PORT 自身にループバックして空レスポンスになる</li>
+</ol>
+<h2>原因</h2>
+<p>WSL2 mirrored networking は Windows と WSL2 が同一 LAN IP を共有する。
+この状態で portproxy を追加しても冗長どころか干渉する。
+portproxy は NAT モード用の仕組みであり、mirrored では不要かつ有害。</p>
+<h2>解決策</h2>
+<p>portproxy を完全削除する:</p>
+<div class="codehilite"><pre><span></span><code><span class="c"># 管理者 PowerShell</span>
+<span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">delete</span> <span class="n">v4tov4</span> <span class="n">listenaddress</span><span class="p">=</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">68</span><span class="p">.</span><span class="n">60</span> <span class="n">listenport</span><span class="p">=</span><span class="n">9100</span>
+<span class="c"># または全削除</span>
+<span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">reset</span>
+</code></pre></div>
+
+<p>WSL2 内のサービス（node_exporter 等）はポート 9100 で直接起動すれば、
+Windows Firewall を開放するだけで LAN から到達できる:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">netsh</span> <span class="n">advfirewall</span> <span class="n">firewall</span> <span class="n">add</span> <span class="n">rule</span> <span class="n">name</span><span class="p">=</span><span class="n">node_exporter</span> <span class="n">dir</span><span class="p">=</span><span class="k">in</span> <span class="n">action</span><span class="p">=</span><span class="n">allow</span> <span class="n">protocol</span><span class="p">=</span><span class="n">TCP</span> <span class="n">localport</span><span class="p">=</span><span class="n">9100</span>
+</code></pre></div>
+
+<h2>予防</h2>
+<ul>
+<li>mirrored networking 環境では portproxy を新規設定しない</li>
+<li>既存の portproxy 設定がある場合は <code>netsh interface portproxy show all</code> で確認し、
+  mirrored 環境では不要なエントリを削除する</li>
+<li>Ollama 用の portproxy は歴史的に残っているが冗長（害はない模様）</li>
+</ul>
+                <div class="related-section">
+            <h2>関連するエラー</h2>
+            <ul class="related-list">
+                <li><a href="../system/windows-firewall-blocks-docker-ports.html">&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;</a></li>
+                <li><a href="../system/wsl2-mirrored-portproxy-port-conflict.html">&quot;WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可&quot;</a></li>
+                <li><a href="../system/wsl2-pod-tcp-blocked-mirrored-networking.html">&quot;WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）&quot;</a></li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

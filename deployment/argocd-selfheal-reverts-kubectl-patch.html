@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;ArgoCD selfHeal が kubectl patch を即座に revert する&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,57 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>deployment</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">argocd</span> <span class="tag">kubernetes</span> <span class="tag">selfheal</span> <span class="tag">gitops</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+        <h2>症状</h2>
+<p><code>kubectl patch</code> や <code>kubectl edit</code> で ArgoCD 管理下のリソースを変更しても、
+数秒〜数十秒後に ArgoCD が自動的に git の状態に戻してしまう。</p>
+<div class="codehilite"><pre><span></span><code>kubectl<span class="w"> </span>patch<span class="w"> </span>application<span class="w"> </span>arc-runner-set<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>merge<span class="w"> </span>-p<span class="w"> </span><span class="s1">&#39;{&quot;spec&quot;:{&quot;source&quot;:{&quot;helm&quot;:{&quot;values&quot;:&quot;githubConfigUrl: ...&quot;}}}}&#39;</span>
+<span class="c1"># → ArgoCD が即 revert → 変更が消える</span>
 </code></pre></div>
 
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>ArgoCD Application に <code>selfHeal: true</code> が設定されている場合、
+クラスタ上のリソースと git の状態に差分が生じると自動同期して git 側に戻す。
+これは GitOps の正常動作。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
-</code></pre></div>
-
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
+<p>変更を反映させるには <strong>git リポジトリ側を更新してマージ</strong> する。</p>
+<ol>
+<li>対象ファイルを編集してコミット・push:</li>
+</ol>
+<p><code>bash
+   # 例: arc-runner-set.yaml を編集
+   git add k8s/argocd/apps/arc-runner-set.yaml
+   git commit -m "fix: update githubConfigUrl"
+   git push</code></p>
+<ol>
+<li>
+<p>ArgoCD は <code>targetRevision: main</code> をウォッチしているため、
+   main ブランチへのマージ後に自動同期される。</p>
+</li>
+<li>
+<p>緊急で即時反映が必要な場合は ArgoCD UI / CLI で手動 Sync:
+   <code>bash
+   argocd app sync arc-runner-set</code>
+   ただし selfHeal で git state に戻る前提で設計すること。</p>
+</li>
+</ol>
 <h2>予防</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>ArgoCD 管理リソースは直接 kubectl で変更しない運用を徹底する</li>
+<li><code>selfHeal: true</code> のアプリは「kubectl で変えてもすぐ消える」と認識する</li>
+<li>一時的なデバッグ変更も PR を立てて検証する（ブランチ push → ArgoCD dev env で確認）</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
+                <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
             </ul>
         </div>
 

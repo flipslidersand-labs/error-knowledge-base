@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</title>
+    <title>&quot;PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,33 +47,46 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>other</strong></span>
+            <span>カテゴリ: <strong>github</strong></span>
             <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">git</span> <span class="tag">lint-staged</span> <span class="tag">husky</span> <span class="tag">pre-commit</span> 
+            <span class="tag">github</span> <span class="tag">pr</span> <span class="tag">issue</span> <span class="tag">auto-close</span> <span class="tag">gotcha</span> 
         </div>
-        <h1>lint-staged: stash/pop でブランチが意図せず切り替わる</h1>
+        <h1>PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない</h1>
 <h2>症状</h2>
-<p><code>feat/doc-ingest-pipeline</code> ブランチでコミット後、カレントブランチが
-<code>perf/round11-optimizations</code> に戻っていた。
-その後 <code>ls scripts/doc_ingest/</code> が <code>__pycache__</code> しか表示しない。</p>
+<p><code>close #2 #3 #4 #5 #6 #7</code> と書いたコミットで PR を default ブランチにマージしたが、
+自動クローズされたのは <strong>#2 だけ</strong>。#3-#7 は OPEN のまま残った。
+PR 本文の <code>Closes #2, #3, #4, #5, #6, #7</code> でも同様に先頭しか閉じない。</p>
 <h2>原因</h2>
-<p>lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、
-異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。</p>
+<p>GitHub の Issue 自動クローズは <strong>「キーワード + 単一の Issue 番号」</strong> のペアしか解釈しない。
+1 つのキーワードに番号をスペース区切り・カンマ区切りで並べても、後続の番号は
+プレーンな参照（リンク）として扱われ、クローズ対象にならない。</p>
 <h2>解決策</h2>
-<p>影響を受けたブランチのファイルは <code>git show &lt;branch&gt;:&lt;path&gt;</code> で参照する:</p>
-<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>show<span class="w"> </span>feat/doc-ingest-pipeline:scripts/doc_ingest/cli.py
+<p>各 Issue 番号に対してキーワードを繰り返す。</p>
+<div class="codehilite"><pre><span></span><code>Closes #2
+Closes #3
+Closes #4
 </code></pre></div>
 
-<p>根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。</p>
+<p>取りこぼした場合は手動クローズで復旧できる。</p>
+<div class="codehilite"><pre><span></span><code><span class="k">for</span><span class="w"> </span>n<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="m">6</span><span class="w"> </span><span class="m">7</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>gh<span class="w"> </span>issue<span class="w"> </span>close<span class="w"> </span><span class="nv">$n</span><span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;<span class="w"> </span>--reason<span class="w"> </span>completed<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--comment<span class="w"> </span><span class="s2">&quot;PR #9 で対応済み（自動クローズ漏れの手動対応）&quot;</span>
+<span class="k">done</span>
+</code></pre></div>
+
 <h2>予防</h2>
-<p>コミット直後は <code>git branch --show-current</code> で正しいブランチにいるか確認する。</p>
+<ul>
+<li>PR 本文/コミットで複数 Issue を閉じるときは <strong>1 番号ごとにキーワードを書く</strong></li>
+<li>マージ後は必ず対象 Issue の state を確認する（<code>gh issue view &lt;n&gt; --json state</code>）</li>
+<li>対応: <code>Closes #2, #3</code> / <code>close #2 #3</code> は NG、<code>Closes #2</code> を行ごとに列挙が正</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../tooling/worktree-husky-lint-staged-missing.html">&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;</a></li>
+                <li><a href="../github/stacked-pr-base-merge-wrong-target.html">&quot;stacked PR を base 未確認でマージし master に入らなかった（PR #148）&quot;</a></li>
                 <li><a href="../github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a></li>
-                <li><a href="../go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a></li>
+                <li><a href="../system/github-app-org-level-runners-404.html">&quot;GitHub App org-level runners API が 404 (user account の場合)&quot;</a></li>
             </ul>
         </div>
 

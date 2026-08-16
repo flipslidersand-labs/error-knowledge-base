@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</title>
+    <title>&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,33 +47,41 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>other</strong></span>
+            <span>カテゴリ: <strong>go</strong></span>
             <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">git</span> <span class="tag">lint-staged</span> <span class="tag">husky</span> <span class="tag">pre-commit</span> 
+            <span class="tag">go</span> <span class="tag">git</span> <span class="tag">merge-conflict</span> <span class="tag">model-harbor</span> 
         </div>
-        <h1>lint-staged: stash/pop でブランチが意図せず切り替わる</h1>
-<h2>症状</h2>
-<p><code>feat/doc-ingest-pipeline</code> ブランチでコミット後、カレントブランチが
-<code>perf/round11-optimizations</code> に戻っていた。
-その後 <code>ls scripts/doc_ingest/</code> が <code>__pycache__</code> しか表示しない。</p>
+        <h2>症状</h2>
+<p>PR #4 (<code>feat/auth-middleware</code> → <code>feat/phase1-proxy</code>) と PR #5 (<code>feat/chat-completions-auth-3</code> → <code>master</code>) が同一機能（Bearer 認証）を別アーキテクチャで実装。PR #5 を master にマージ後、PR #4 をリベースすると <code>cmd/modelharbor/main.go</code> でコンフリクト。</p>
 <h2>原因</h2>
-<p>lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、
-異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。</p>
+<ul>
+<li>PR #4: <code>internal/router</code> に <code>BearerAuth()</code> を追加、<code>main.go</code> で <code>provider.NewOpenAI/Anthropic</code> + <code>router.New</code> を使用</li>
+<li>PR #5: <code>internal/httpapi</code> パッケージを新設、<code>main.go</code> を <code>serveCmd()</code> スタイルに全面刷新</li>
+<li>両者が <code>main.go</code> の <code>runServe</code> / <code>serveCmd</code> 定義を競合</li>
+</ul>
 <h2>解決策</h2>
-<p>影響を受けたブランチのファイルは <code>git show &lt;branch&gt;:&lt;path&gt;</code> で参照する:</p>
-<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>show<span class="w"> </span>feat/doc-ingest-pipeline:scripts/doc_ingest/cli.py
+<p>PR #5 の実装（httpapi パッケージ、fail-closed、カンマ区切り複数キー）が上位互換のため採用。PR #4 の <code>main.go</code> を PR #5 版に差し替えてリベース完了後、古い PR をクローズ。</p>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>rebase<span class="w"> </span>origin/master<span class="w">  </span><span class="c1"># conflict on main.go</span>
+<span class="c1"># PR #5 の serveCmd() 版を取る</span>
+git<span class="w"> </span>add<span class="w"> </span>cmd/modelharbor/main.go
+git<span class="w"> </span>rebase<span class="w"> </span>--continue
+git<span class="w"> </span>push<span class="w"> </span>--force-with-lease<span class="w"> </span>origin<span class="w"> </span>feat/chat-completions-auth-3
+gh<span class="w"> </span>pr<span class="w"> </span>merge<span class="w"> </span><span class="m">5</span><span class="w"> </span>--squash<span class="w"> </span>--delete-branch
+gh<span class="w"> </span>pr<span class="w"> </span>close<span class="w"> </span><span class="m">4</span><span class="w"> </span>--comment<span class="w"> </span><span class="s2">&quot;PR #5 でより完全な実装がマージされたためクローズ&quot;</span>
 </code></pre></div>
 
-<p>根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。</p>
 <h2>予防</h2>
-<p>コミット直後は <code>git branch --show-current</code> で正しいブランチにいるか確認する。</p>
+<ul>
+<li>同一リポジトリで複数セッションが同機能を実装しないよう Issue アサイン確認。</li>
+<li>スタック PR（feat/A → feat/B → master）は後続 PR が先に master 入りすると必ずコンフリクト。直接 master をベースにするか worktree で分離する。</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../tooling/worktree-husky-lint-staged-missing.html">&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;</a></li>
                 <li><a href="../github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a></li>
-                <li><a href="../go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a></li>
+                <li><a href="../go/bench-deadlock-defer-cleanup-drain.html">&quot;Go benchmark: defer cleanup() でドレイン goroutine がデッドロック&quot;</a></li>
+                <li><a href="../go/mesh-drop-branch-diverge-port.html">&quot;master から分岐したブランチへの機能ポート手順&quot;</a></li>
             </ul>
         </div>
 

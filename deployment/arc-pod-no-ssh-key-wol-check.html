@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,41 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>deployment</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">wol</span> <span class="tag">ssh</span> <span class="tag">nc</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+        <h2>症状</h2>
+<p><code>_wol-ds1.yml</code> の「DS1 オンライン確認」ステップで SSH チェックを使っていたが、
+ARC runner pod 内に SSH 鍵が存在しないため常に失敗し WoL が誤ってトリガーされる。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 失敗するコード</span>
+ssh<span class="w"> </span>-o<span class="w"> </span><span class="nv">ConnectTimeout</span><span class="o">=</span><span class="m">5</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">BatchMode</span><span class="o">=</span>yes<span class="w"> </span>ds1<span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
 </code></pre></div>
 
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>ARC runner は Kubernetes pod として起動する。pod 内には <code>~/.ssh/</code> が存在しない。
+<code>BatchMode=yes</code> のため認証失敗で即 exit=1 → 常に「DS1 オフライン」と判定。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<p>SSH の代わりに <code>nc</code> (netcat) で TCP 到達チェックを使う:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span>nc<span class="w"> </span>-z<span class="w"> </span>-w3<span class="w"> </span><span class="m">192</span>.168.68.60<span class="w"> </span><span class="m">22</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;DS1 is already online&quot;</span>
+<span class="k">fi</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li><code>-z</code>: ポートスキャンモード（データ送信なし）</li>
+<li><code>-w3</code>: 3秒タイムアウト</li>
 </ul>
+<h2>予防</h2>
+<p>ARC runner job で SSH を使う処理が必要な場合はシークレットから鍵を mount するか、
+TCP 到達チェックで代替できないか検討する。</p>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
+                <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
             </ul>
         </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;WSL2 で sudo パスワード不要で systemd サービスを登録する方法&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,62 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>infra</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">infra</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
+        <h1>WSL2 で sudo パスワード不要で systemd サービスを登録する方法</h1>
+<h2>発生日</h2>
+<p>2026-08-02</p>
 <h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+<p>SSH 経由の非インタラクティブセッションでは <code>sudo</code> がパスワードを要求し、
+systemd サービスファイルの書き込み・登録ができない。</p>
+<div class="codehilite"><pre><span></span><code>sudo: a password is required
 </code></pre></div>
 
-<h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
+<p><code>wsl -u root</code> を使って root ユーザーとして直接コマンドを実行する。
+WSL2 では <code>-u root</code> フラグで sudo なしに root シェルが起動できる。</p>
+<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>yuki-private<span class="w"> </span><span class="s2">&quot;wsl -d Ubuntu -u root bash -c &#39;</span>
+<span class="s2">cat &gt; /etc/systemd/system/myservice.service &lt;&lt; SVCEOF</span>
+<span class="s2">[Unit]</span>
+<span class="s2">Description=My Service</span>
+<span class="s2">After=network-online.target</span>
 
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<span class="s2">[Service]</span>
+<span class="s2">Type=simple</span>
+<span class="s2">User=yukih-linux</span>
+<span class="s2">ExecStart=/path/to/run.sh</span>
+<span class="s2">Restart=on-failure</span>
+
+<span class="s2">[Install]</span>
+<span class="s2">WantedBy=multi-user.target</span>
+<span class="s2">SVCEOF</span>
+<span class="s2">systemctl daemon-reload</span>
+<span class="s2">systemctl enable --now myservice.service</span>
+<span class="s2">&#39;&quot;</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
+<h2>前提</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>Windows ホスト上で <code>wsl -u root</code> が許可されている（デフォルトで許可）</li>
+<li>WSL2 の <code>/etc/wsl.conf</code> に <code>systemd=true</code> が設定済み</li>
+</ul>
+<h2>注意</h2>
+<p>heredoc 内でシェル変数展開が必要な場合は <code>'SVCEOF'</code> ではなく <code>SVCEOF</code>（クォートなし）を使う。
+ただし SSH コマンドのクォートと混在するとエスケープが複雑になるため、
+内容はファイルで管理して <code>cat &lt; /path/to/file | tee /etc/systemd/system/...</code> 経由にするのが安全。</p>
+<h2>関連</h2>
+<ul>
+<li>Issue #329: arc-dev-pc-yuki systemd 永続化</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../infra/arc-listener-wrong-url-crashloop.html">&quot;ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり&quot;</a></li>
+                <li><a href="../infra/arc-runner-label-scope-separation.html">&quot;ARC runner label のスコープ分離（personal repo）&quot;</a></li>
+                <li><a href="../infra/memory-runaway-process-debug.html">&quot;メモリ爆食いプロセスの特定・kill 手順&quot;</a></li>
             </ul>
         </div>
 

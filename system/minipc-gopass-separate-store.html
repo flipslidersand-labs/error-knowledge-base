@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;MINIPC の gopass は dev 機と別ストア — SSH 先で gopass ls が空になる&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,31 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
+            <span>カテゴリ: <strong>system</strong></span>
             <span class="severity severity-low">low</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">gopass</span> <span class="tag">minipc</span> <span class="tag">secrets</span> <span class="tag">ssh</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
-</code></pre></div>
-
+        <h2>症状</h2>
+<p>dev 機で <code>gopass ls</code> すると infra/discord/* 等が見えるが、
+<code>ssh minipc "gopass ls"</code> は何も返らない（空出力）。</p>
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>gopass は <code>~/.password-store</code> をユーザーごとに管理する。
+MINIPC の yuki ユーザーは独立した gopass ストアを持っており、
+dev 機のエントリとは別管理になっている。
+MINIPC 側には <code>infra/discord/webhook-decompose</code> 等の一部エントリのみ登録されている。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
-</code></pre></div>
-
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
+<p>MINIPC に新しいシークレットを登録する場合は <code>ssh minipc "gopass insert &lt;path&gt;"</code> で直接挿入する。
+または dev 機の gopass エントリを <code>gopass sync</code> / <code>gopass recipients</code> で共有する（GPG キーが必要）。</p>
 <h2>予防</h2>
-<ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
-</ul>
+<p>ssh 先で gopass を使うスクリプトを書く前に、
+<code>ssh &lt;host&gt; "gopass ls &lt;path&gt; 2&gt;/dev/null || echo NOT_FOUND"</code> で存在確認を先行する。</p>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
+                <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
+                <li><a href="../github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a></li>
             </ul>
         </div>
 

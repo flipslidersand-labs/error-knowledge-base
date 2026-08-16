@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;master から分岐したブランチへの機能ポート手順&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,42 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>go</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">go</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
-</code></pre></div>
-
-<h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
-<h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
-</code></pre></div>
-
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
+        <h1>master から分岐したブランチへの機能ポート手順</h1>
+<h2>状況</h2>
+<p><code>perf/round11-optimizations</code> は master の round12/13 より前に分岐していた。
+master で追加された TLS フィンガープリント基盤（#160 系）が存在しないため、
+round11 ブランチで code-review した #207 等を実装するには先に基盤をポートする必要があった。</p>
+<h2>手順</h2>
+<ol>
+<li>master の該当ファイルを参照ソースとして使用（<code>flipslidersand/mesh-drop/</code> サブディレクトリ）</li>
+<li>ポートしたい関数・型を特定して新ファイルに実装</li>
+<li>依存関係（import 追加）を忘れずに追加</li>
+<li>コンパイルエラーから依存を芋づる式に発見する</li>
+</ol>
+<h2>merge 時のコンフリクト解消方針</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>セキュリティ修正・品質改善は HEAD（自分の実装）を保持</li>
+<li>master が HEAD より進化させたテストファイルは <code>git checkout --theirs</code> で採用</li>
+<li>両方に存在する機能（<code>clear</code> vs <code>zeroBytes</code> 等）は master の関数名に統一</li>
+<li>master にしかない新関数（<code>BenchmarkDeriveChunkStreamKey</code> 等）は手動でマージ</li>
+</ul>
+<h2>注意</h2>
+<ul>
+<li><code>git checkout --ours</code> / <code>--theirs</code> 後は必ず <code>go build</code> + <code>go test</code> で確認</li>
+<li>noise.go の <code>clear(pt)</code> → <code>zeroBytes</code> 変更時は <code>zeroBytes</code> 関数の存在確認</li>
+<li>同一ファイルに重複定義が生まれる場合（parseFingerprint 等）は <code>--ours</code> で回避し重複チェック</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../go/bench-deadlock-defer-cleanup-drain.html">&quot;Go benchmark: defer cleanup() でドレイン goroutine がデッドロック&quot;</a></li>
+                <li><a href="../go/mesh-drop-merge-conflict-gh-pr-edit.html">&quot;gh pr edit が Projects (classic) 警告で exit 1 になる&quot;</a></li>
+                <li><a href="../go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a></li>
             </ul>
         </div>
 

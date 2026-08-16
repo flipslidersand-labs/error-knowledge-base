@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&quot;pnpm 11 supply-chain policy で GitHub Actions CI が失敗する&quot;</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; background: white;
+                    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #222; margin: 20px 0 10px; }
+        h2 { color: #0066cc; margin: 20px 0 10px; font-size: 1.2em; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+               font-family: 'Monaco', 'Courier New', monospace; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; }
+        .back a { color: #0066cc; }
+        .page-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .severity { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.75em;
+                   font-weight: bold; color: white; }
+        .severity-high { background: #cc3300; }
+        .severity-medium { background: #cc7700; }
+        .severity-low { background: #007700; }
+        .tag { display: inline-block; background: #e8f0ff; color: #0044aa; border-radius: 12px;
+               padding: 2px 10px; font-size: 0.8em; margin: 2px; border: 1px solid #c0d0f0; }
+        .source-badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.7em;
+                       font-weight: bold; color: white; margin-left: 6px; }
+        .source-personal { background: #0066cc; }
+        .source-web { background: #666666; }
+        .related-section { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .related-section h2 { color: #555; font-size: 1.1em; margin-bottom: 12px; }
+        .related-list { list-style: none; }
+        .related-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .related-list li:last-child { border-bottom: none; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; font-weight: bold; }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back"><a href="../">← インデックスに戻る</a></div>
+        <div class="page-meta">
+            <span>カテゴリ: <strong>tooling</strong></span>
+            <span class="severity severity-high">high</span>
+            <span class="source-badge source-personal">実体験</span>
+            <span class="tag">tooling</span> <span class="tag">CI</span> 
+        </div>
+        <h1>pnpm 11 supply-chain policy で GitHub Actions CI が失敗する</h1>
+<ul>
+<li><strong>severity</strong>: high</li>
+<li><strong>category</strong>: tooling / CI</li>
+<li><strong>date</strong>: 2026-07-13</li>
+</ul>
+<h2>症状</h2>
+<p><code>pnpm install --frozen-lockfile</code> が以下のエラーで失敗する:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION</span>
+<span class="n">Package</span><span class="w"> </span><span class="s">&quot;foo@1.2.3&quot;</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="n">published</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="n">hours</span><span class="w"> </span><span class="n">ago</span><span class="p">.</span>
+<span class="n">The</span><span class="w"> </span><span class="n">publisher</span><span class="w"> </span><span class="n">policy</span><span class="w"> </span><span class="n">requires</span><span class="w"> </span><span class="n">packages</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">least</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="n">hours</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="n">before</span><span class="w"> </span><span class="n">installation</span><span class="p">.</span>
+</code></pre></div>
+
+<h2>原因</h2>
+<p>pnpm 11 (latest) は supply-chain attack 対策として <code>minimumReleaseAge</code> ポリシーを導入。
+公開から24時間以内のパッケージを自動ブロックする。
+GitHub Actions の <code>pnpm/action-setup@v4</code> に <code>version: latest</code> を指定すると pnpm 11 がインストールされる。</p>
+<h2>解決策</h2>
+<p><code>deploy.yml</code> で pnpm バージョンを <code>10</code> に固定する:</p>
+<div class="codehilite"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pnpm/action-setup@v4</span>
+<span class="w">  </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"> </span><span class="c1"># 11 はsupply-chain policyでブロックされる</span>
+</code></pre></div>
+
+<p><code>.npmrc</code> に <code>minimumReleaseAge=0</code> を書く方法もあるが、ポリシーをオフにするより pnpm 10 を使う方が安全。</p>
+<h2>予防</h2>
+<p>新規リポの GitHub Pages CI テンプレートは最初から <code>version: 10</code> で固定する。
+pnpm メジャーバージョンを上げる際はこのポリシーの影響を確認すること。</p>
+                <div class="related-section">
+            <h2>関連するエラー</h2>
+            <ul class="related-list">
+                <li><a href="../tooling/actionlint-ignore-yaml-unsupported.html">&quot;actionlint: YAML config の `ignore` キーは未サポート&quot;</a></li>
+                <li><a href="../tooling/claude-code-silent-userpromptsubmit-hook.html">&quot;Claude Code 無応答 — UserPromptSubmit フック参照切れ&quot;</a></li>
+                <li><a href="../tooling/git-checkout-branch-confusion.html">&quot;git checkout -b 後も別ブランチにコミットされた&quot;</a></li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

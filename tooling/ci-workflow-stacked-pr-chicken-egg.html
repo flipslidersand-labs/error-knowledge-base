@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;CI workflow が main 未マージ → stacked PR で CI がトリガーされない&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,40 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>tooling</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">github-actions</span> <span class="tag">stacked-pr</span> <span class="tag">ci</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
-</code></pre></div>
-
+        <h2>症状</h2>
+<p>PR#1（CI workflow 追加）→ PR#2（README）→ PR#3（テスト）のように stacked PR を作ると、
+PR#2/#3 では CI チェックが一切実行されず "no checks" になる。</p>
+<p>PR#1 の CI も fmt/clippy エラーが残ったまま failing になる。</p>
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>GitHub Actions は <code>.github/workflows/*.yml</code> が <strong>default branch（main）</strong> に存在する場合のみ
+pull_request イベントでトリガーされる。</p>
+<p>stacked PR#1 がマージされて初めて CI workflow が main に入る → それまで PR#2/#3 は CI 無し。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<p><strong>全変更を1ブランチに集約して1つの PR にする。</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># stacked branchをrebaseして全コミットを1ブランチに持ってくる</span>
+git<span class="w"> </span>rebase<span class="w"> </span>origin/main
+<span class="c1"># 新ブランチ名で push（force push 代替）</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feat/all-changes
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>feat/all-changes
+gh<span class="w"> </span>pr<span class="w"> </span>create<span class="w"> </span>--base<span class="w"> </span>main<span class="w"> </span>--head<span class="w"> </span>feat/all-changes
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
+<p>squash merge 後に旧 PR（#1/#2/#3）を individually close する。</p>
 <h2>予防</h2>
-<ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
-</ul>
+<p>CI workflow 自体を新規追加する際は必ずその branch に全変更を含めるか、
+main に CI を先行マージしてから機能ブランチを作る。
+stacked PR + CI 同時追加の組み合わせは避ける。</p>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
+                <li><a href="../ci/arc-org-404-listener-crashloop.html">&quot;ARC listener crash loop — org-level 404 / scale set ID 不一致&quot;</a></li>
+                <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
             </ul>
         </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;Sakura VPS の Vault は Docker 内にあり、ホストに vault バイナリがない&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,44 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>infra</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">vault</span> <span class="tag">sakura-vps</span> <span class="tag">docker</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
-</code></pre></div>
-
+        <h2>症状</h2>
+<p>SSH で Sakura VPS に入り <code>vault kv get ...</code> を実行すると <code>vault: command not found</code> が出る。</p>
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>VPS ホストには vault バイナリがインストールされていない。
+Vault は <code>vault-server</code> という Docker コンテナとして稼働しており、コンテナ内にのみバイナリがある。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>ubuntu@os3-369-17699.vs.sakura.ne.jp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;docker exec vault-server env \</span>
+<span class="s2">    VAULT_ADDR=http://127.0.0.1:8200 \</span>
+<span class="s2">    VAULT_TOKEN=&lt;token&gt; \</span>
+<span class="s2">    vault kv get secret/infra/discord-test&quot;</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
+<p>トークンは gopass から取得:</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">ROOT_TOKEN</span><span class="o">=</span><span class="k">$(</span>gopass<span class="w"> </span>show<span class="w"> </span>cloud/sakura/vault/root-token<span class="k">)</span>
+</code></pre></div>
+
 <h2>予防</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>SSH 後に <code>which vault</code> で確認する前に、まず <code>docker ps | grep vault</code> でコンテナ確認</li>
+<li><code>minipc-token</code> は権限が限定的（403 になる場合あり）。管理操作は <code>root-token</code> を使う</li>
+<li>ローカルから SSH トンネル経由で Vault に接続したい場合:
+  <code>bash
+  ssh -L 8200:localhost:8200 ubuntu@os3-369-17699.vs.sakura.ne.jp -N &amp;
+  export VAULT_ADDR=http://127.0.0.1:8200
+  vault kv get secret/infra/...</code></li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../deployment/nginx-acme-conf-overrides-default-server.html">&quot;nginx: acme.conf の server_name 指定ブロックが default_server より優先され 301 リダイレクトが効かない&quot;</a></li>
+                <li><a href="../system/windows-firewall-blocks-docker-ports.html">&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;</a></li>
+                <li><a href="../system/wsl2-ssh-complex-bash-args.html">&quot;WSL2 SSH 経由の bash -c 複雑引数が exit 1 で失敗&quot;</a></li>
             </ul>
         </div>
 

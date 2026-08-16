@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&quot;actionlint: YAML config の `ignore` キーは未サポート&quot;</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; background: white;
+                    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #222; margin: 20px 0 10px; }
+        h2 { color: #0066cc; margin: 20px 0 10px; font-size: 1.2em; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+               font-family: 'Monaco', 'Courier New', monospace; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; }
+        .back a { color: #0066cc; }
+        .page-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .severity { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.75em;
+                   font-weight: bold; color: white; }
+        .severity-high { background: #cc3300; }
+        .severity-medium { background: #cc7700; }
+        .severity-low { background: #007700; }
+        .tag { display: inline-block; background: #e8f0ff; color: #0044aa; border-radius: 12px;
+               padding: 2px 10px; font-size: 0.8em; margin: 2px; border: 1px solid #c0d0f0; }
+        .source-badge { display: inline-block; border-radius: 4px; padding: 1px 8px; font-size: 0.7em;
+                       font-weight: bold; color: white; margin-left: 6px; }
+        .source-personal { background: #0066cc; }
+        .source-web { background: #666666; }
+        .related-section { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .related-section h2 { color: #555; font-size: 1.1em; margin-bottom: 12px; }
+        .related-list { list-style: none; }
+        .related-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .related-list li:last-child { border-bottom: none; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; font-weight: bold; }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back"><a href="../">← インデックスに戻る</a></div>
+        <div class="page-meta">
+            <span>カテゴリ: <strong>tooling</strong></span>
+            <span class="severity severity-medium">medium</span>
+            <span class="source-badge source-personal">実体験</span>
+            <span class="tag">tooling</span> 
+        </div>
+        <h1>actionlint: YAML config の <code>ignore</code> キーは未サポート</h1>
+<h2>症状</h2>
+<p><code>.github/actionlint.yaml</code> に <code>ignore: ["SC2016"]</code> を追加しても
+actionlint がエラーを抑制しない。</p>
+<h2>環境</h2>
+<ul>
+<li>actionlint v1.7.12（Docker: rhysd/actionlint:latest）</li>
+<li><code>.github/actionlint.yaml</code> で <code>ignore</code> キーを使用</li>
+</ul>
+<h2>原因</h2>
+<p><code>ignore</code> は actionlint の YAML config file では<strong>サポートされていない</strong>キー。
+CLI フラグ <code>-ignore &lt;regexp&gt;</code> としてのみ有効。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ❌ 機能しない（YAML config では無視される）</span>
+<span class="nt">ignore</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;SC2016&quot;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># ✅ 機能する（CLI フラグ）</span>
+actionlint<span class="w"> </span>-ignore<span class="w"> </span><span class="s2">&quot;SC2016&quot;</span><span class="w"> </span>.github/workflows/*.yml
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/repo&quot;</span><span class="w"> </span>-w<span class="w"> </span>/repo<span class="w"> </span>rhysd/actionlint:latest<span class="w"> </span>-ignore<span class="w"> </span><span class="s2">&quot;SC2016&quot;</span>
+</code></pre></div>
+
+<h2>関連: ファイル先頭の shellcheck disable も機能しない</h2>
+<p>actionlint は shellcheck 実行時にシェバン行（<code>#!/bin/bash</code>）を注入する。
+そのため <code>run: |</code> ブロック先頭の <code># shellcheck disable=SC2016</code> は
+「ファイル全体への適用」ではなく「次の1行のみ」の disable として機能してしまう。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ❌ 機能しない（ファイル全体 disable を意図しているが無効）</span>
+<span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">  </span><span class="no"># shellcheck disable=SC2016</span>
+<span class="w">  </span><span class="no">set -euo pipefail</span>
+<span class="w">  </span><span class="no">...</span>
+</code></pre></div>
+
+<h2>解決策</h2>
+<p>問題行の<strong>直前</strong>に per-line disable コメントを追加する。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># shellcheck disable=SC2016</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FULL_DIFF</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span>-v<span class="w"> </span><span class="nv">pat</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$pat</span><span class="s2">&quot;</span><span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">  /^diff --git / { found = (substr($0, ...) == pat) }</span>
+<span class="s1">  found { print }</span>
+<span class="s1">&#39;</span>
+</code></pre></div>
+
+<h2>SC2016 の実際の誤検知原因</h2>
+<p>マークダウン用バッククォートが単引用符内にある場合、
+shellcheck がコマンド置換（<code>`cmd`</code>）と誤判定して SC2016 を発生させる。</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ❌ SC2016 誤検知（バッククォートがコマンド置換に見える）</span>
+<span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;ファイル `%s` の diff をレビュー...&#39;</span>
+
+<span class="c1"># ✅ per-line disable で解消</span>
+<span class="c1"># shellcheck disable=SC2016</span>
+<span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;ファイル `%s` の diff をレビュー...&#39;</span>
+</code></pre></div>
+
+<h2>参照</h2>
+<ul>
+<li>PR #374 (fix): SC2016 per-line disable 4箇所追加</li>
+<li>2026-08-02 セッション</li>
+</ul>
+                <div class="related-section">
+            <h2>関連するエラー</h2>
+            <ul class="related-list">
+                <li><a href="../tooling/claude-code-silent-userpromptsubmit-hook.html">&quot;Claude Code 無応答 — UserPromptSubmit フック参照切れ&quot;</a></li>
+                <li><a href="../tooling/git-checkout-branch-confusion.html">&quot;git checkout -b 後も別ブランチにコミットされた&quot;</a></li>
+                <li><a href="../tooling/global-gitignore-logs-dir.html">&quot;global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする&quot;</a></li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

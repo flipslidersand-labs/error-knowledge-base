@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;gh issue create でラベルが存在しない場合 Issue 自体も作成されない&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,42 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>tooling</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">github-cli</span> <span class="tag">gh</span> <span class="tag">issues</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+        <h2>症状</h2>
+<p><code>gh issue create --label "security,priority:critical"</code> を実行したとき、ラベルが存在しないリポジトリでは以下の警告だけ出て Issue が作成されなかった。</p>
+<div class="codehilite"><pre><span></span><code>could not add label: &#39;security&#39; not found
+could not add label: &#39;priority:critical&#39; not found
 </code></pre></div>
 
+<p>終了コードは 0 のように見えたが、実際には Issue が作成されていなかった。</p>
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p><code>gh issue create</code> は <code>--label</code> でラベルが見つからない場合、処理全体を中断する（警告を出して終了するが Issue は未作成）。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
+<p>ラベルなしで作成するか、<code>gh api</code> を直接使う:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># ラベルなしで作成</span>
+gh<span class="w"> </span>issue<span class="w"> </span>create<span class="w"> </span>--title<span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span>--body<span class="w"> </span><span class="s2">&quot;...&quot;</span>
 
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<span class="c1"># または gh api 経由（ラベルを省略すれば確実に作成される）</span>
+gh<span class="w"> </span>api<span class="w"> </span>repos/&lt;owner&gt;/&lt;repo&gt;/issues<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span><span class="nv">title</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span><span class="nv">body</span><span class="o">=</span><span class="s2">&quot;...&quot;</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
+<p>ラベルが必要な場合は Issue 作成後に別途付与:</p>
+<div class="codehilite"><pre><span></span><code>gh<span class="w"> </span>issue<span class="w"> </span>edit<span class="w"> </span>&lt;number&gt;<span class="w"> </span>--add-label<span class="w"> </span><span class="s2">&quot;security&quot;</span><span class="w"> </span>--repo<span class="w"> </span>&lt;owner&gt;/&lt;repo&gt;
+</code></pre></div>
+
 <h2>予防</h2>
-<ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
-</ul>
+<p>ラベルが存在しないリポジトリで <code>gh issue create --label</code> を使わない。
+<code>gh api</code> 経由の POST は <code>--label</code> オプションがないため、ラベル未存在でも失敗しない。</p>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../tooling/issues-close-cwd-cross-repo-misfire.html">&quot;pnpm issues:close が cwd に関係なく Platform リポの Issue に誤爆する&quot;</a></li>
             </ul>
         </div>
 

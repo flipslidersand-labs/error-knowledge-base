@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -48,37 +48,28 @@
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
             <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">python</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
+        <h1>Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する</h1>
 <h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+<div class="codehilite"><pre><span></span><code>{&quot;status&quot;: &quot;error&quot;, &quot;message&quot;: &quot;Unrecognized processing class in cl-nagoya/ruri-base.
+Can&#39;t instantiate a processor, a tokenizer ...&quot;}
 </code></pre></div>
 
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
-<h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
-</code></pre></div>
-
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
+<p><code>cl-nagoya/ruri-base</code> モデルの tokenizer config が HuggingFace transformers の
+<code>AutoTokenizer</code> で認識できないクラスを持っている。
+transformers バージョンと ruri-base の tokenizer_config.json の <code>tokenizer_class</code> が
+不一致の可能性。</p>
+<h2>影響範囲</h2>
+<p><code>scripts/memory-ingest.py</code> の全 ingest コマンドが失敗する（sessions / facts とも）。</p>
+<h2>未解決・次回確認事項</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>transformers バージョン確認 <code>pip show transformers</code></li>
+<li>ruri-base の tokenizer_config.json を確認し <code>tokenizer_class</code> の値を調べる</li>
+<li><code>sentence-transformers</code> の別モデル（all-mpnet-base-v2）への切り替えを検討</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>

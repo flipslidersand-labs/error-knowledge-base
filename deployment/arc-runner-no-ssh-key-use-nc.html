@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</title>
+    <title>&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -50,43 +50,43 @@
             <span>カテゴリ: <strong>deployment</strong></span>
             <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">kubernetes</span> <span class="tag">helm</span> <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">ci</span> 
+            <span class="tag">arc</span> <span class="tag">github-actions</span> <span class="tag">kubernetes</span> <span class="tag">ssh</span> <span class="tag">nc</span> 
         </div>
-        <h1>ARC runner scale set: user-level githubConfigUrl で 404</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code><span class="nl">error:</span><span class="w"> </span><span class="n">failed</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">runner</span><span class="w"> </span><span class="n">registration</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="nl">refresh:</span>
-<span class="w">  </span><span class="n">request</span><span class="w"> </span><span class="n">POST</span><span class="w"> </span><span class="nl">https:</span><span class="c1">//api.github.com/orgs/&lt;username&gt;/actions/runners/registration-token</span>
-<span class="w">  </span><span class="n">failed</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s">&quot;404 Not Found&quot;</span><span class="p">)</span>
+        <h2>症状</h2>
+<p><code>.github/workflows/_wol-ds1.yml</code> の WoL ワークフローで、
+DS1 がオンラインになったか確認するために <code>ssh</code> を使っていたが、
+ARC runner pod 内に秘密鍵が存在しないため接続に失敗する。</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">ssh</span>:<span class="w"> </span><span class="k">connect</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">host</span><span class="w"> </span><span class="mi">192</span>.<span class="mi">168</span>.<span class="mi">68</span>.<span class="mi">60</span><span class="w"> </span><span class="nv">port</span><span class="w"> </span><span class="mi">22</span>:<span class="w"> </span><span class="nv">Connection</span><span class="w"> </span><span class="nv">refused</span>
+<span class="nv">Permission</span><span class="w"> </span><span class="nv">denied</span><span class="w"> </span><span class="ss">(</span><span class="nv">publickey</span><span class="ss">)</span>
 </code></pre></div>
 
-<p>AutoscalingRunnerSet の listener pod が起動しない。</p>
 <h2>原因</h2>
-<p><code>githubConfigUrl: https://github.com/&lt;username&gt;</code> (user/org-level) を指定すると、
-ARC 0.14.2 が <code>/orgs/&lt;username&gt;/actions/runners/registration-token</code> API を叩く。
-個人アカウント（Organization 未作成）の場合、<code>/orgs/</code> エンドポイントは 404。</p>
-<p>GitHub は user-level self-hosted runner を <code>/user/runners</code> で提供しているが、
-ARC 0.14.2 はこのエンドポイントを使わず <code>/orgs/</code> に固定している。</p>
+<p>ARC (Actions Runner Controller) の runner pod は Kubernetes Pod として起動する。
+Pod 内には <code>~/.ssh/id_*</code> 等の SSH 鍵が存在しない（マウントしていない）。
+SSH 接続の認証フェーズに到達できず、ホストの死活確認自体ができない。</p>
 <h2>解決策</h2>
-<p><code>githubConfigUrl</code> を <strong>repo-level</strong> に変更する:</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">githubConfigUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/&lt;username&gt;/&lt;repo-name&gt;</span>
+<p>SSH の代わりに <code>nc</code>（netcat）でポート疎通確認に置き換える:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Before (SSH — ARC pod 内では不可)</span>
+ssh<span class="w"> </span>-o<span class="w"> </span><span class="nv">ConnectTimeout</span><span class="o">=</span><span class="m">5</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">StrictHostKeyChecking</span><span class="o">=</span>no<span class="w"> </span>user@192.168.68.60<span class="w"> </span><span class="s2">&quot;exit&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+
+<span class="c1"># After (nc — TCP 到達チェックのみ)</span>
+nc<span class="w"> </span>-z<span class="w"> </span>-w3<span class="w"> </span><span class="m">192</span>.168.68.60<span class="w"> </span><span class="m">22</span>
 </code></pre></div>
 
-<p>runner は指定リポジトリ専用になる。複数リポジトリで共有するには、
-Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。</p>
-<h2>回避策</h2>
-<p>Organization を作成し、org-level URL (<code>https://github.com/&lt;org&gt;</code>) を使う。
-org スコープ runner は全リポジトリで共有可能。</p>
-<h2>関連</h2>
+<p><code>-z</code>: ポートスキャンモード（データ送受信なし）
+<code>-w3</code>: タイムアウト 3 秒</p>
+<h2>予防</h2>
 <ul>
-<li>ARC version: 0.14.2 (gha-runner-scale-set chart)</li>
-<li>Epic #854 CI Compute Platform</li>
+<li>ARC runner pod で SSH を使う場合は、Kubernetes Secret + volumeMount で鍵を注入する必要がある</li>
+<li>ホスト死活確認だけが目的なら <code>nc -z</code> で十分</li>
+<li><code>curl -s --connect-timeout 3 http://IP:PORT/</code> も代替として使える（HTTPサービスの場合）</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
-                <li><a href="../deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a></li>
                 <li><a href="../deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a></li>
+                <li><a href="../deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a></li>
+                <li><a href="../deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a></li>
             </ul>
         </div>
 

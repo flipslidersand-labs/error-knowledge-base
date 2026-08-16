@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;k3s WSL2 インストール が sudo でハング（30+分）&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,40 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>tooling</strong></span>
+            <span class="severity severity-high">high</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">wsl2</span> <span class="tag">k3s</span> <span class="tag">sudo</span> <span class="tag">systemd</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
-<h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
+        <h2>症状</h2>
+<p>YUKI WSL2 Ubuntu で k3s インストールコマンド実行時に sudo で権限昇格しようとしたが、パスワード入力を求められてハング（50+ 分）。</p>
+<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>yuki-private<span class="w"> </span><span class="s1">&#39;curl -sfL https://get.k3s.io | sudo sh -&#39;</span>
+<span class="c1"># → パスワード入力待ち → タイムアウト</span>
 </code></pre></div>
 
 <h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
+<p>WSL2 では systemd が init になっており、sudo を使う場合は <strong>パスワード認証が必須</strong>。
+リモート SSH セッションからパスワード入力できず、タイムアウト。</p>
 <h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
+<p>sudo ではなく <code>wsl -u root</code> を使って直接 root で実行:</p>
+<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>yuki-private<span class="w"> </span><span class="s1">&#39;wsl -u root bash -c &quot;curl -sfL https://get.k3s.io | sh -&quot;&#39;</span>
 </code></pre></div>
 
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
+<p>これにより:</p>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li>パスワード入力不要</li>
+<li>WSL Ubuntu 内で root shell で直接実行</li>
+<li>タイムアウトなし</li>
 </ul>
+<h2>予防</h2>
+<p>WSL2 内での root 実行が必要な場合は <code>sudo</code> ではなく <code>wsl -u root</code> 経由で行う。
+特に CI/CD パイプラインからの自動実行時に有効。</p>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../system/wsl2-pod-tcp-blocked-mirrored-networking.html">&quot;WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）&quot;</a></li>
+                <li><a href="../system/windows-firewall-blocks-docker-ports.html">&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;</a></li>
+                <li><a href="../system/wsl2-mirrored-networking-portproxy-conflict.html">&quot;WSL2 mirrored networking で portproxy を使うと connection reset になる&quot;</a></li>
             </ul>
         </div>
 

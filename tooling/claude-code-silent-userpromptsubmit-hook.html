@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</title>
+    <title>&quot;Claude Code 無応答 — UserPromptSubmit フック参照切れ&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,33 +47,65 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>other</strong></span>
+            <span>カテゴリ: <strong>tooling</strong></span>
             <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">git</span> <span class="tag">lint-staged</span> <span class="tag">husky</span> <span class="tag">pre-commit</span> 
+            <span class="tag">tooling</span> 
         </div>
-        <h1>lint-staged: stash/pop でブランチが意図せず切り替わる</h1>
+        <h1>Claude Code 無応答 — UserPromptSubmit フック参照切れ</h1>
 <h2>症状</h2>
-<p><code>feat/doc-ingest-pipeline</code> ブランチでコミット後、カレントブランチが
-<code>perf/round11-optimizations</code> に戻っていた。
-その後 <code>ls scripts/doc_ingest/</code> が <code>__pycache__</code> しか表示しない。</p>
+<p>新規セッションで入力しても読み込み後にサイレント（応答返らない）。</p>
 <h2>原因</h2>
-<p>lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、
-異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。</p>
-<h2>解決策</h2>
-<p>影響を受けたブランチのファイルは <code>git show &lt;branch&gt;:&lt;path&gt;</code> で参照する:</p>
-<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>show<span class="w"> </span>feat/doc-ingest-pipeline:scripts/doc_ingest/cli.py
+<p><code>UserPromptSubmit</code> フックが2箇所に登録されており、片方のスクリプトパスが古いままだった。</p>
+<table>
+<thead>
+<tr>
+<th>設定ファイル</th>
+<th>スクリプト</th>
+<th>状態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>~/.claude/projects/.../settings.json</code>（プロジェクト）</td>
+<td><code>qdrant-rag-hook.py</code></td>
+<td>正常</td>
+</tr>
+<tr>
+<td><code>~/.claude/settings.json</code>（ユーザー）</td>
+<td><code>rag-hook.py</code>（存在しない）</td>
+<td>毎回エラー → タイムアウト</td>
+</tr>
+</tbody>
+</table>
+<p><code>rag-hook.py</code> はリファクタで <code>qdrant-rag-hook.py</code> にリネームされたが、ユーザー設定側の参照が更新されていなかった。</p>
+<h2>修正</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># どのファイルが古い名前を参照しているか確認</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;rag-hook.py&quot;</span><span class="w"> </span>~/.claude/
+
+<span class="c1"># ユーザー設定の壊れた UserPromptSubmit エントリを削除</span>
+<span class="c1"># ~/.claude/settings.json の hooks.UserPromptSubmit から該当エントリを除去</span>
 </code></pre></div>
 
-<p>根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。</p>
-<h2>予防</h2>
-<p>コミット直後は <code>git branch --show-current</code> で正しいブランチにいるか確認する。</p>
+<h2>確認方法</h2>
+<div class="codehilite"><pre><span></span><code>cat<span class="w"> </span>~/.claude/settings.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">import sys,json; d=json.load(sys.stdin)</span>
+<span class="s2">print(d.get(&#39;hooks&#39;,{}).get(&#39;UserPromptSubmit&#39;,[]))</span>
+<span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>→ 存在しないパスを参照しているエントリがないこと</p>
+<h2>教訓</h2>
+<ul>
+<li>フック用スクリプトをリネームしたら <code>~/.claude/settings.json</code> と <code>.claude/settings.json</code> の両方を更新する</li>
+<li>無応答・遅延の第一チェックポイントは <code>UserPromptSubmit</code> フックのスクリプトパス</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../tooling/worktree-husky-lint-staged-missing.html">&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;</a></li>
-                <li><a href="../github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a></li>
-                <li><a href="../go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a></li>
+                <li><a href="../tooling/actionlint-ignore-yaml-unsupported.html">&quot;actionlint: YAML config の `ignore` キーは未サポート&quot;</a></li>
+                <li><a href="../tooling/git-checkout-branch-confusion.html">&quot;git checkout -b 後も別ブランチにコミットされた&quot;</a></li>
+                <li><a href="../tooling/global-gitignore-logs-dir.html">&quot;global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする&quot;</a></li>
             </ul>
         </div>
 

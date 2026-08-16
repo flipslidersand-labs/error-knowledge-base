@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</title>
+    <title>&quot;ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり&quot;</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -47,45 +47,69 @@
     <div class="container">
         <div class="back"><a href="../">← インデックスに戻る</a></div>
         <div class="page-meta">
-            <span>カテゴリ: <strong>python</strong></span>
-            <span class="severity severity-low">low</span>
+            <span>カテゴリ: <strong>infra</strong></span>
+            <span class="severity severity-medium">medium</span>
             <span class="source-badge source-personal">実体験</span>
-            <span class="tag">pytest</span> <span class="tag">python</span> <span class="tag">fixtures</span> 
+            <span class="tag">infra</span> 
         </div>
-        <h1>pytest: Fixture called directly エラー</h1>
+        <h1>ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり</h1>
+<h2>発生日</h2>
+<p>2026-08-02</p>
 <h2>症状</h2>
-<div class="codehilite"><pre><span></span><code>Failed: Fixture &quot;in_memory_db&quot; called directly. Fixtures are not meant to be called directly,
-but are created automatically when test functions request them as parameters.
-</code></pre></div>
-
-<h2>原因</h2>
-<p><code>@pytest.fixture</code> で定義した関数を <code>result = in_memory_db()</code> のように直接呼び出した。
-pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。</p>
-<h2>解決策</h2>
-<p>テスト関数のパラメーターとして受け取る:</p>
-<div class="codehilite"><pre><span></span><code><span class="c1"># NG</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">():</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span><span class="p">()</span>  <span class="c1"># 直接呼び出し</span>
-
-<span class="c1"># OK</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_something</span><span class="p">(</span><span class="n">in_memory_db</span><span class="p">):</span>  <span class="c1"># pytest が自動注入</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">in_memory_db</span>
-</code></pre></div>
-
-<p>外部パッケージが提供する fixture (<code>qa_shared.conftest_shared</code> 等) は
-プロジェクトの <code>conftest.py</code> で <code>from qa_shared.conftest_shared import *</code> として
-pytest に認識させる必要がある。</p>
-<h2>予防</h2>
 <ul>
-<li>fixture のテストは直接呼び出しで動作確認しようとしない</li>
-<li>パッケージ提供 fixture は必ず <code>conftest.py</code> で re-export する</li>
+<li><code>arc-runners</code> にランナーポッドが起動しない</li>
+<li>GitHub broker が <code>assigned job=0</code> を返し続ける</li>
+<li>多数のジョブが長時間 <code>queued</code> のまま</li>
+</ul>
+<h2>根本原因</h2>
+<p><code>arc-systems</code> namespace に2つの <code>AutoscalingListener</code> が混在していた。</p>
+<table>
+<thead>
+<tr>
+<th>リソース名</th>
+<th>githubConfigUrl</th>
+<th>状態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>arc-dev-nodee-674c8dbc-listener</code></td>
+<td><code>flipslidersand/dev-nodee-infrastructure</code> ✅</td>
+<td>Running</td>
+</tr>
+<tr>
+<td><code>arc-dev-nodee-69c49dfd-listener</code></td>
+<td><code>flipslidersand/dev-infrastructure</code> ❌</td>
+<td>CrashLoop</td>
+</tr>
+</tbody>
+</table>
+<p>クラッシュしている listener が ARC controller のリソースを消費し、正常な listener のスケーリングを阻害していた。</p>
+<h2>調査コマンド</h2>
+<div class="codehilite"><pre><span></span><code>kubectl<span class="w"> </span>get<span class="w"> </span>autoscalinglisteners<span class="w"> </span>-n<span class="w"> </span>arc-systems
+kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>arc-systems<span class="w"> </span>&lt;listener-pod&gt;<span class="w"> </span>--tail<span class="o">=</span><span class="m">20</span>
+</code></pre></div>
+
+<h2>修正</h2>
+<div class="codehilite"><pre><span></span><code>kubectl<span class="w"> </span>delete<span class="w"> </span>autoscalinglistener<span class="w"> </span>arc-dev-nodee-69c49dfd-listener<span class="w"> </span>-n<span class="w"> </span>arc-systems
+</code></pre></div>
+
+<p>削除後、即座にランナーポッドが起動した。</p>
+<h2>予防策</h2>
+<ul>
+<li>ARC helm upgrade 後に <code>kubectl get autoscalinglisteners -n arc-systems</code> で URL を確認する</li>
+<li>URL が <code>githubConfigUrl</code> と一致しているか検証する</li>
+</ul>
+<h2>関連</h2>
+<ul>
+<li>Issue #601: https://github.com/flipslidersand/dev-nodee-infrastructure/issues/601</li>
 </ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
-                <li><a href="../python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a></li>
-                <li><a href="../python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a></li>
-                <li><a href="../python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a></li>
+                <li><a href="../infra/arc-runner-label-scope-separation.html">&quot;ARC runner label のスコープ分離（personal repo）&quot;</a></li>
+                <li><a href="../infra/memory-runaway-process-debug.html">&quot;メモリ爆食いプロセスの特定・kill 手順&quot;</a></li>
+                <li><a href="../infra/vault-sync-strip-components.html">&quot;Vault sync — tar --strip-components 数が不足でネストディレクトリが発生&quot;</a></li>
             </ul>
         </div>
 
