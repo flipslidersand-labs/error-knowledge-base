@@ -229,7 +229,7 @@ def build():
 
     index_html += f"""        <footer>
             <p>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-            <p><a href="https://github.com/flipslidersand/error-knowledge-base">GitHub Repository</a></p>
+            <p><a href="https://github.com/flipslidersand-labs/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
 
