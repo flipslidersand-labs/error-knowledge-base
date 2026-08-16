@@ -9,6 +9,7 @@ import json
 import html
 import markdown
 import bleach
+import yaml
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Tuple
@@ -35,32 +36,41 @@ def js_string(value: str) -> str:
     """HTML 属性内の JS 文字列リテラルとして安全に埋め込む（onclick 等）。"""
     return html.escape(json.dumps(value))
 
+VALID_SEVERITY = {"high", "medium", "low"}
+
+
+def normalize_tags(value) -> List[str]:
+    """tags を文字列リストに正規化（list / 単一文字列 / None を許容）。"""
+    if isinstance(value, list):
+        return [str(v).strip() for v in value if str(v).strip()]
+    if isinstance(value, str) and value.strip():
+        return [value.strip()]
+    return []
+
+
+def normalize_severity(value) -> str:
+    """severity を許容値に正規化（不正値は medium にフォールバック）。"""
+    v = str(value).strip().lower() if value is not None else ""
+    return v if v in VALID_SEVERITY else "medium"
+
+
 def parse_frontmatter(text: str) -> Tuple[Dict, str]:
-    """frontmatter を YAML 形式で抽出（--- で囲まれた部分）"""
+    """frontmatter（--- で囲まれた YAML）を PyYAML で安全に抽出する。
+
+    値内カンマや引用符を含むタグも正しく扱える。YAML として不正な場合は
+    空 meta にフォールバックし、本文だけを返す（ビルドは継続）。
+    """
     match = re.match(r'^---\s*\n(.*?)\n---\s*\n', text, re.DOTALL)
     if not match:
         return {}, text
 
-    frontmatter_text = match.group(1)
     body = text[match.end():]
-    meta = {}
-
-    for line in frontmatter_text.split('\n'):
-        if not line.strip():
-            continue
-        if ':' not in line:
-            continue
-
-        key, value = line.split(':', 1)
-        key = key.strip()
-        value = value.strip()
-
-        # tags を list に変換 [a, b, c] 形式
-        if key == 'tags':
-            value = value.strip('[]').split(',')
-            value = [v.strip() for v in value]
-
-        meta[key] = value
+    try:
+        meta = yaml.safe_load(match.group(1)) or {}
+        if not isinstance(meta, dict):
+            meta = {}
+    except yaml.YAMLError:
+        meta = {}
 
     return meta, body
 
@@ -85,8 +95,8 @@ def load_all_errors(errors_dir: Path) -> List[Dict]:
 
             # frontmatter がない場合、空の meta で処理継続
             title = meta.get('title') or extract_h1(body) or md_file.stem
-            tags = meta.get('tags', [])
-            severity = meta.get('severity', 'medium')
+            tags = normalize_tags(meta.get('tags'))
+            severity = normalize_severity(meta.get('severity'))
             source = meta.get('source', 'web')  # デフォルト: web
 
             # 検索用テキスト（本文から Markdown 記号を除去）
@@ -97,7 +107,7 @@ def load_all_errors(errors_dir: Path) -> List[Dict]:
                 'stem': md_file.stem,
                 'html_path': f"{category_name}/{md_file.stem}.html",
                 'title': title,
-                'tags': tags if isinstance(tags, list) else [],
+                'tags': tags,
                 'severity': severity,
                 'source': source,
                 'meta': meta,
