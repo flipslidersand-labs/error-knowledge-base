@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  # peaceiris/actions-gh-pages は gh-pages ブランチへ push するため contents: write が必須。
+  # pages/id-token は native actions/deploy-pages 用で本ワークフローでは未使用のため付与しない。
+  contents: write
 
 jobs:
   build-and-deploy:
