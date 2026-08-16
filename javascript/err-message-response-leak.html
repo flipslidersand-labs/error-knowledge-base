@@ -53,26 +53,26 @@
             <span class="tag">javascript</span> 
         </div>
         <h1>err.message をレスポンスに直接渡すパターンの漏洩</h1>
-<p><strong>発生プロジェクト</strong>: <code>yukilabs-core/api-server</code><br />
-<strong>関連 Issue</strong>: #605 (fix) / #606 (prevention)<br />
+<p><strong>発生プロジェクト</strong>: <code>yukilabs-core/api-server</code><br>
+<strong>関連 Issue</strong>: #605 (fix) / #606 (prevention)<br>
 <strong>発見日</strong>: 2026-08-02</p>
-<hr />
+<hr>
 <h2>事象</h2>
 <p><code>/api/health/detailed</code> の 503 パスで <code>err.message</code> がそのままクライアントに返されていた。</p>
 <div class="codehilite"><pre><span></span><code><span class="c1">// 修正前</span>
 <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">503</span><span class="p">).</span><span class="nx">json</span><span class="p">({</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;unhealthy&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="p">});</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h2>見落とし原因（#414 セキュリティ監査で検出できなかった理由）</h2>
 <ol>
 <li><strong>監査スコープが不完全</strong>: <code>src/index.js</code> のみを確認し <code>src/routes/</code> 配下を網羅していなかった</li>
 <li><strong>テスト不足</strong>: 503 パスのテストは status code のみ検証していた（<code>error</code> フィールドの中身を検証していなかった）</li>
 <li><strong>catch ブロックのパターン盲点</strong>: 正常系コードレビュー中心で、catch ブロック内のレスポンスに注意が向きにくい</li>
 </ol>
-<hr />
+<hr>
 <h2>修正内容</h2>
-<p><code>monitoring.js</code> の 503/500 エラーパスで静的メッセージに変更。<br />
+<p><code>monitoring.js</code> の 503/500 エラーパスで静的メッセージに変更。<br>
 <code>authController.js</code> は <code>err.code</code> がある場合（意図的な構造化エラー）のみ <code>err.message</code> を使用。</p>
 <div class="codehilite"><pre><span></span><code><span class="c1">// 修正後パターン</span>
 <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">503</span><span class="p">).</span><span class="nx">json</span><span class="p">({</span><span class="w"> </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Database connection failed&quot;</span><span class="w"> </span><span class="p">});</span>
@@ -81,7 +81,7 @@
 <span class="kd">const</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">code</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Authentication failed&quot;</span><span class="p">;</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h2>再発防止チェックリスト</h2>
 <p>セキュリティ監査・コードレビュー時に <code>catch</code> ブロック内を必ず確認する:</p>
 <ul>
@@ -89,7 +89,7 @@
 <li>[ ] 500/503 レスポンスに動的な内部エラー情報が含まれていないか</li>
 <li>[ ] <code>err.code</code> がない外部ライブラリエラーが素通りしないか（DB, HTTP client, JWT lib など）</li>
 </ul>
-<hr />
+<hr>
 <h2>CI での自動検出</h2>
 <div class="codehilite"><pre><span></span><code><span class="c1"># catch ブロック内の err.message 漏洩パターンを grep</span>
 grep<span class="w"> </span>-rn<span class="w"> </span><span class="s1">&#39;error: err\.message\|err\.message.*res\.&#39;</span><span class="w"> </span>src/<span class="w"> </span><span class="se">\</span>
@@ -104,7 +104,7 @@ grep<span class="w"> </span>-rn<span class="w"> </span><span class="s1">&#39;err
 <span class="p">}</span>
 </code></pre></div>
 
-<hr />
+<hr>
 <h2>教訓</h2>
 <ul>
 <li><strong>catch ブロックは正常系と同じ厳密さでレビューする</strong></li>
