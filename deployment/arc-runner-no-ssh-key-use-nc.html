@@ -56,8 +56,8 @@
 <p><code>.github/workflows/_wol-ds1.yml</code> の WoL ワークフローで、
 DS1 がオンラインになったか確認するために <code>ssh</code> を使っていたが、
 ARC runner pod 内に秘密鍵が存在しないため接続に失敗する。</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">ssh</span>:<span class="w"> </span><span class="k">connect</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">host</span><span class="w"> </span><span class="mi">192</span>.<span class="mi">168</span>.<span class="mi">68</span>.<span class="mi">60</span><span class="w"> </span><span class="nv">port</span><span class="w"> </span><span class="mi">22</span>:<span class="w"> </span><span class="nv">Connection</span><span class="w"> </span><span class="nv">refused</span>
-<span class="nv">Permission</span><span class="w"> </span><span class="nv">denied</span><span class="w"> </span><span class="ss">(</span><span class="nv">publickey</span><span class="ss">)</span>
+<div class="codehilite"><pre><span></span><code><span class="n">ssh</span><span class="o">:</span><span class="w"> </span><span class="n">connect</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="mf">192.168</span><span class="o">.</span><span class="mf">68.60</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="mi">22</span><span class="o">:</span><span class="w"> </span><span class="n">Connection</span><span class="w"> </span><span class="n">refused</span>
+<span class="n">Permission</span><span class="w"> </span><span class="n">denied</span><span class="w"> </span><span class="o">(</span><span class="n">publickey</span><span class="o">)</span>
 </code></pre></div>
 
 <h2>原因</h2>

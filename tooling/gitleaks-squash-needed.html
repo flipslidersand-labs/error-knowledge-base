@@ -55,9 +55,9 @@
         <h2>症状</h2>
 <p>PR に「①キーをハードコード」「②env var に修正」の 2 コミットが含まれると、
 gitleaks が ① の diff を検出して fail する（② で修正済みでも）。</p>
-<div class="codehilite"><pre><span></span><code>Finding: EMBED_KEY = &quot;REDACTED&quot;
-RuleID:  generic-api-key
-Commit:  f7bd204...
+<div class="codehilite"><pre><span></span><code><span class="n">Finding</span><span class="o">:</span><span class="w"> </span><span class="n">EMBED_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;REDACTED&quot;</span>
+<span class="n">RuleID</span><span class="o">:</span><span class="w">  </span><span class="n">generic</span><span class="o">-</span><span class="n">api</span><span class="o">-</span><span class="n">key</span>
+<span class="n">Commit</span><span class="o">:</span><span class="w">  </span><span class="n">f7bd204</span><span class="o">...</span>
 </code></pre></div>
 
 <h2>原因</h2>

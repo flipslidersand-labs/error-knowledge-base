@@ -55,8 +55,8 @@
         <h1>git: .gitmodules なしのサブモジュールで CI 全ジョブ失敗</h1>
 <h2>症状</h2>
 <p>CI の全ジョブが以下で失敗。</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">fatal</span>:<span class="w"> </span><span class="nv">no</span><span class="w"> </span><span class="nv">submodule</span><span class="w"> </span><span class="nv">mapping</span><span class="w"> </span><span class="nv">found</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span>.<span class="nv">gitmodules</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="s1">&#39;self-data&#39;</span>
-<span class="k">exit</span><span class="w"> </span><span class="nv">code</span><span class="w"> </span><span class="mi">128</span>
+<div class="codehilite"><pre><span></span><code><span class="n">fatal</span><span class="o">:</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">submodule</span><span class="w"> </span><span class="n">mapping</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">.</span><span class="na">gitmodules</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="s1">&#39;self-data&#39;</span>
+<span class="n">exit</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="mi">128</span>
 </code></pre></div>
 
 <p>gitleaks / actionlint / auto-fix の全ジョブが同時にコケた。</p>
