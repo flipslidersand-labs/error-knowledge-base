@@ -22,7 +22,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install markdown pygments bleach
+        run: pip install markdown pygments bleach pyyaml
 
       - name: Build HTML from Markdown
         run: python scripts/build.py
