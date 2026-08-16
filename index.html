@@ -197,8 +197,8 @@
         <h2 style="margin: 30px 0 15px; color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">🎯 実体験</h2>
         <div class="category">
             <h3>📁 CI</h3>
-            <div class="error-card" data-tags="ci" data-title="&quot;ARC listener crash loop — org-level 404 / scale set ID 不一致&quot;" data-text="ARC listener crash loop — org-level 404 / scale set ID 不一致 エラーメッセージ または: 症状 で listener が / （Risk Classify 等）が QUEUED のまま2時間以上詰まる コントローラー pod は Running だが reconcile loop が止まらない 原因 解決手順 org-level 404 の場合（#411 の症状） または Helm chart の を repo-level に変更： その後 または で listener を再起動。 scale set ID 404 の場合 旧 ID を参照している listener pod を削除すると、コントローラーが正しい ID で新 pod を起動する： 1つでも Running な listener があれば、Error pod の削除後に自己回復する（正常挙動）。 回帰確認コマンド org-level へ戻す手順（#689 GitHub org 作成後） 1. GitHub org を作成し、ランナー権限を付与 2. を に変更 3. ">
-                <a href="ci/arc-org-404-listener-crashloop.html">&quot;ARC listener crash loop — org-level 404 / scale set ID 不一致&quot;</a>
+            <div class="error-card" data-tags="ci" data-title="ARC listener crash loop — org-level 404 / scale set ID 不一致" data-text="ARC listener crash loop — org-level 404 / scale set ID 不一致 エラーメッセージ または: 症状 で listener が / （Risk Classify 等）が QUEUED のまま2時間以上詰まる コントローラー pod は Running だが reconcile loop が止まらない 原因 解決手順 org-level 404 の場合（#411 の症状） または Helm chart の を repo-level に変更： その後 または で listener を再起動。 scale set ID 404 の場合 旧 ID を参照している listener pod を削除すると、コントローラーが正しい ID で新 pod を起動する： 1つでも Running な listener があれば、Error pod の削除後に自己回復する（正常挙動）。 回帰確認コマンド org-level へ戻す手順（#689 GitHub org 作成後） 1. GitHub org を作成し、ランナー権限を付与 2. を に変更 3. ">
+                <a href="ci/arc-org-404-listener-crashloop.html">ARC listener crash loop — org-level 404 / scale set ID 不一致</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
@@ -206,8 +206,8 @@
         </div>
         <div class="category">
             <h3>📁 DATABASE</h3>
-            <div class="error-card" data-tags="duckdb,concurrency,claude-code" data-title="&quot;DuckDB 複数 Claude セッションが同時書き込みでロック競合&quot;" data-text="症状 複数の Claude Code セッションが同じ に同時に書き込もうとし、 全セッションが で失敗し続ける。 セッション A が終わるとセッション B が取得 → C が待つ、という連鎖で永遠に詰まる。 原因 DuckDB はシングルライター設計（PostgreSQL と異なりマルチプロセス書き込みは非対応） Claude Code は複数セッションを並列起動できるため、それぞれが独立して を実行 各セッションが異なるタグ（rust / go / python）で同時 crawl/push しようとする 解決策 即時対策 他の Claude セッションが終わるまで待つ（現セッションで以下をポーリング）： 根本対策（未実装） 1. *にファイルロック機構を追加*— でプロセスをキューイング 2. **DuckDB を read_only モードで開く*— stats/list は で競合しない 3. **実行を1セッションに限定する*— や コマンドで逐次実行をスケジュール 緊急時（作業中の別セッションを kill したい場合） ただし DuckDB ファイルは書き込み中断でも W">
-                <a href="database/duckdb-concurrent-sessions-lock.html">&quot;DuckDB 複数 Claude セッションが同時書き込みでロック競合&quot;</a>
+            <div class="error-card" data-tags="duckdb,concurrency,claude-code" data-title="DuckDB 複数 Claude セッションが同時書き込みでロック競合" data-text="症状 複数の Claude Code セッションが同じ に同時に書き込もうとし、 全セッションが で失敗し続ける。 セッション A が終わるとセッション B が取得 → C が待つ、という連鎖で永遠に詰まる。 原因 DuckDB はシングルライター設計（PostgreSQL と異なりマルチプロセス書き込みは非対応） Claude Code は複数セッションを並列起動できるため、それぞれが独立して を実行 各セッションが異なるタグ（rust / go / python）で同時 crawl/push しようとする 解決策 即時対策 他の Claude セッションが終わるまで待つ（現セッションで以下をポーリング）： 根本対策（未実装） 1. *にファイルロック機構を追加*— でプロセスをキューイング 2. **DuckDB を read_only モードで開く*— stats/list は で競合しない 3. **実行を1セッションに限定する*— や コマンドで逐次実行をスケジュール 緊急時（作業中の別セッションを kill したい場合） ただし DuckDB ファイルは書き込み中断でも W">
+                <a href="database/duckdb-concurrent-sessions-lock.html">DuckDB 複数 Claude セッションが同時書き込みでロック競合</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;duckdb&quot;)">duckdb</span>
@@ -217,8 +217,8 @@
         </div>
         <div class="category">
             <h3>📁 DEPLOYMENT</h3>
-            <div class="error-card" data-tags="arc,github-actions,wol,ssh,nc" data-title="&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;" data-text="症状 の「DS1 オンライン確認」ステップで SSH チェックを使っていたが、 ARC runner pod 内に SSH 鍵が存在しないため常に失敗し WoL が誤ってトリガーされる。 原因 ARC runner は Kubernetes pod として起動する。pod 内には が存在しない。 のため認証失敗で即 exit=1 → 常に「DS1 オフライン」と判定。 解決策 SSH の代わりに (netcat) で TCP 到達チェックを使う: : ポートスキャンモード（データ送信なし） : 3秒タイムアウト 予防 ARC runner job で SSH を使う処理が必要な場合はシークレットから鍵を mount するか、 TCP 到達チェックで代替できないか検討する。">
-                <a href="deployment/arc-pod-no-ssh-key-wol-check.html">&quot;ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗&quot;</a>
+            <div class="error-card" data-tags="arc,github-actions,wol,ssh,nc" data-title="ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗" data-text="症状 の「DS1 オンライン確認」ステップで SSH チェックを使っていたが、 ARC runner pod 内に SSH 鍵が存在しないため常に失敗し WoL が誤ってトリガーされる。 原因 ARC runner は Kubernetes pod として起動する。pod 内には が存在しない。 のため認証失敗で即 exit=1 → 常に「DS1 オフライン」と判定。 解決策 SSH の代わりに (netcat) で TCP 到達チェックを使う: : ポートスキャンモード（データ送信なし） : 3秒タイムアウト 予防 ARC runner job で SSH を使う処理が必要な場合はシークレットから鍵を mount するか、 TCP 到達チェックで代替できないか検討する。">
+                <a href="deployment/arc-pod-no-ssh-key-wol-check.html">ARC runner pod 内に SSH 鍵がなく WoL ping チェックが失敗</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;arc&quot;)">arc</span>
@@ -227,8 +227,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ssh&quot;)">ssh</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;nc&quot;)">nc</span>
             </div>
-            <div class="error-card" data-tags="arc,github-actions,kubernetes,runner" data-title="&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;" data-text="症状 の GitHub Actions ジョブが queued のまま実行されない。 ARC listener ログでは がループし続ける。 原因 ARC runner scale set の は登録先リポジトリ/org を決定する。 は に登録されているため、 のジョブは dispatch されない。 さらに ランナーを新設しても に アクセス可能なトークンが必要（既存の flipslidersand PAT は pull 権限のみ）。 解決策 1. 専用シークレットを作成: 2. ArgoCD Application manifest で専用シークレットを参照: 3. 全ワークフローの を に統一。 予防 org をまたぐ場合は必ず別 runner scale set + 別シークレットを作成する に設定したリポジトリ以外のジョブは絶対に届かない runner scale set 登録後に で確認 （ARC v2 は旧 API に出ないが 0 なら未登録の可能性あり）">
-                <a href="deployment/arc-runner-githubconfigurl-scope.html">&quot;ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）&quot;</a>
+            <div class="error-card" data-tags="arc,github-actions,kubernetes,runner" data-title="ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）" data-text="症状 の GitHub Actions ジョブが queued のまま実行されない。 ARC listener ログでは がループし続ける。 原因 ARC runner scale set の は登録先リポジトリ/org を決定する。 は に登録されているため、 のジョブは dispatch されない。 さらに ランナーを新設しても に アクセス可能なトークンが必要（既存の flipslidersand PAT は pull 権限のみ）。 解決策 1. 専用シークレットを作成: 2. ArgoCD Application manifest で専用シークレットを参照: 3. 全ワークフローの を に統一。 予防 org をまたぐ場合は必ず別 runner scale set + 別シークレットを作成する に設定したリポジトリ以外のジョブは絶対に届かない runner scale set 登録後に で確認 （ARC v2 は旧 API に出ないが 0 なら未登録の可能性あり）">
+                <a href="deployment/arc-runner-githubconfigurl-scope.html">ARC runner が別 org のジョブを拾わない（githubConfigUrl スコープ制限）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;arc&quot;)">arc</span>
@@ -236,8 +236,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;kubernetes&quot;)">kubernetes</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;runner&quot;)">runner</span>
             </div>
-            <div class="error-card" data-tags="arc,github-actions,kubernetes,ssh,nc" data-title="&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;" data-text="症状 の WoL ワークフローで、 DS1 がオンラインになったか確認するために を使っていたが、 ARC runner pod 内に秘密鍵が存在しないため接続に失敗する。 原因 ARC (Actions Runner Controller) の runner pod は Kubernetes Pod として起動する。 Pod 内には 等の SSH 鍵が存在しない（マウントしていない）。 SSH 接続の認証フェーズに到達できず、ホストの死活確認自体ができない。 解決策 SSH の代わりに （netcat）でポート疎通確認に置き換える: : ポートスキャンモード（データ送受信なし） : タイムアウト 3 秒 予防 ARC runner pod で SSH を使う場合は、Kubernetes Secret + volumeMount で鍵を注入する必要がある ホスト死活確認だけが目的なら で十分 も代替として使える（HTTPサービスの場合）">
-                <a href="deployment/arc-runner-no-ssh-key-use-nc.html">&quot;ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える&quot;</a>
+            <div class="error-card" data-tags="arc,github-actions,kubernetes,ssh,nc" data-title="ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える" data-text="症状 の WoL ワークフローで、 DS1 がオンラインになったか確認するために を使っていたが、 ARC runner pod 内に秘密鍵が存在しないため接続に失敗する。 原因 ARC (Actions Runner Controller) の runner pod は Kubernetes Pod として起動する。 Pod 内には 等の SSH 鍵が存在しない（マウントしていない）。 SSH 接続の認証フェーズに到達できず、ホストの死活確認自体ができない。 解決策 SSH の代わりに （netcat）でポート疎通確認に置き換える: : ポートスキャンモード（データ送受信なし） : タイムアウト 3 秒 予防 ARC runner pod で SSH を使う場合は、Kubernetes Secret + volumeMount で鍵を注入する必要がある ホスト死活確認だけが目的なら で十分 も代替として使える（HTTPサービスの場合）">
+                <a href="deployment/arc-runner-no-ssh-key-use-nc.html">ARC runner pod 内で SSH が使えない — nc でポート疎通確認に置き換える</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;arc&quot;)">arc</span>
@@ -246,8 +246,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ssh&quot;)">ssh</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;nc&quot;)">nc</span>
             </div>
-            <div class="error-card" data-tags="kubernetes,helm,arc,github-actions,ci" data-title="&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;" data-text="ARC runner scale set: user-level githubConfigUrl で 404 症状 AutoscalingRunnerSet の listener pod が起動しない。 原因 (user/org-level) を指定すると、 ARC 0.14.2 が API を叩く。 個人アカウント（Organization 未作成）の場合、 エンドポイントは 404。 GitHub は user-level self-hosted runner を で提供しているが、 ARC 0.14.2 はこのエンドポイントを使わず に固定している。 解決策 を **repo-level*に変更する: runner は指定リポジトリ専用になる。複数リポジトリで共有するには、 Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。 回避策 Organization を作成し、org-level URL ( ) を使う。 org スコープ runner は全リポジトリで共有可能。 関連 ARC version: 0.14.2">
-                <a href="deployment/arc-user-level-org-404.html">&quot;ARC: user-level githubConfigUrl で listener pod が 404 エラー&quot;</a>
+            <div class="error-card" data-tags="kubernetes,helm,arc,github-actions,ci" data-title="ARC: user-level githubConfigUrl で listener pod が 404 エラー" data-text="ARC runner scale set: user-level githubConfigUrl で 404 症状 AutoscalingRunnerSet の listener pod が起動しない。 原因 (user/org-level) を指定すると、 ARC 0.14.2 が API を叩く。 個人アカウント（Organization 未作成）の場合、 エンドポイントは 404。 GitHub は user-level self-hosted runner を で提供しているが、 ARC 0.14.2 はこのエンドポイントを使わず に固定している。 解決策 を **repo-level*に変更する: runner は指定リポジトリ専用になる。複数リポジトリで共有するには、 Organization を作成して org-level URL を使うか、各リポジトリにrunnerを登録する。 回避策 Organization を作成し、org-level URL ( ) を使う。 org スコープ runner は全リポジトリで共有可能。 関連 ARC version: 0.14.2">
+                <a href="deployment/arc-user-level-org-404.html">ARC: user-level githubConfigUrl で listener pod が 404 エラー</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;kubernetes&quot;)">kubernetes</span>
@@ -256,8 +256,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-actions&quot;)">github-actions</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
             </div>
-            <div class="error-card" data-tags="argocd,kubernetes,selfheal,gitops" data-title="&quot;ArgoCD selfHeal が kubectl patch を即座に revert する&quot;" data-text="症状 や で ArgoCD 管理下のリソースを変更しても、 数秒〜数十秒後に ArgoCD が自動的に git の状態に戻してしまう。 原因 ArgoCD Application に が設定されている場合、 クラスタ上のリソースと git の状態に差分が生じると自動同期して git 側に戻す。 これは GitOps の正常動作。 解決策 変更を反映させるには **git リポジトリ側を更新してマージ*する。 1. 対象ファイルを編集してコミット・push: 2. ArgoCD は をウォッチしているため、 main ブランチへのマージ後に自動同期される。 3. 緊急で即時反映が必要な場合は ArgoCD UI / CLI で手動 Sync: ただし selfHeal で git state に戻る前提で設計すること。 予防 ArgoCD 管理リソースは直接 kubectl で変更しない運用を徹底する のアプリは「kubectl で変えてもすぐ消える」と認識する 一時的なデバッグ変更も PR を立てて検証する（ブランチ push → ArgoCD dev env で確認）">
-                <a href="deployment/argocd-selfheal-reverts-kubectl-patch.html">&quot;ArgoCD selfHeal が kubectl patch を即座に revert する&quot;</a>
+            <div class="error-card" data-tags="argocd,kubernetes,selfheal,gitops" data-title="ArgoCD selfHeal が kubectl patch を即座に revert する" data-text="症状 や で ArgoCD 管理下のリソースを変更しても、 数秒〜数十秒後に ArgoCD が自動的に git の状態に戻してしまう。 原因 ArgoCD Application に が設定されている場合、 クラスタ上のリソースと git の状態に差分が生じると自動同期して git 側に戻す。 これは GitOps の正常動作。 解決策 変更を反映させるには **git リポジトリ側を更新してマージ*する。 1. 対象ファイルを編集してコミット・push: 2. ArgoCD は をウォッチしているため、 main ブランチへのマージ後に自動同期される。 3. 緊急で即時反映が必要な場合は ArgoCD UI / CLI で手動 Sync: ただし selfHeal で git state に戻る前提で設計すること。 予防 ArgoCD 管理リソースは直接 kubectl で変更しない運用を徹底する のアプリは「kubectl で変えてもすぐ消える」と認識する 一時的なデバッグ変更も PR を立てて検証する（ブランチ push → ArgoCD dev env で確認）">
+                <a href="deployment/argocd-selfheal-reverts-kubectl-patch.html">ArgoCD selfHeal が kubectl patch を即座に revert する</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;argocd&quot;)">argocd</span>
@@ -265,14 +265,14 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;selfheal&quot;)">selfheal</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;gitops&quot;)">gitops</span>
             </div>
-            <div class="error-card" data-tags="deployment" data-title="&quot;dockerd クラッシュループ: BuildKit history DB 破損&quot;" data-text="dockerd クラッシュループ: BuildKit history DB 破損 症状 が起動直後に （SIGSEGV）でクラッシュ。 systemd が 4 回再起動を試みて &quot;Start request repeated too quickly&quot; で諦める。 は &quot;Cannot connect to the Docker daemon&quot;。全コンテナ停止。 診断手順 1. → failed / restart 上限到達 2. → configuration OK（設定は無実） 3. → ハードウェア/メモリ異常なし 4. → パッケージ整合（部分アップグレードなし） 5. → active（containerd は無実） 6. **完全なスタックトレースを取得**（stderr を捕捉）: 根本原因 スタックトレースが指す: = **BuildKit の build history DB (bbolt) 内の protobuf レコードが破損**。 dockerd 起動時に BuildKit が history を読んで orphan 掃除する際、 壊れた UTF-8 文字列を検証し">
-                <a href="deployment/dockerd-buildkit-history-corruption.html">&quot;dockerd クラッシュループ: BuildKit history DB 破損&quot;</a>
+            <div class="error-card" data-tags="deployment" data-title="dockerd クラッシュループ: BuildKit history DB 破損" data-text="dockerd クラッシュループ: BuildKit history DB 破損 症状 が起動直後に （SIGSEGV）でクラッシュ。 systemd が 4 回再起動を試みて &quot;Start request repeated too quickly&quot; で諦める。 は &quot;Cannot connect to the Docker daemon&quot;。全コンテナ停止。 診断手順 1. → failed / restart 上限到達 2. → configuration OK（設定は無実） 3. → ハードウェア/メモリ異常なし 4. → パッケージ整合（部分アップグレードなし） 5. → active（containerd は無実） 6. **完全なスタックトレースを取得**（stderr を捕捉）: 根本原因 スタックトレースが指す: = **BuildKit の build history DB (bbolt) 内の protobuf レコードが破損**。 dockerd 起動時に BuildKit が history を読んで orphan 掃除する際、 壊れた UTF-8 文字列を検証し">
+                <a href="deployment/dockerd-buildkit-history-corruption.html">dockerd クラッシュループ: BuildKit history DB 破損</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;deployment&quot;)">deployment</span>
             </div>
-            <div class="error-card" data-tags="github-actions,billing,spending-limit,self-hosted-runner" data-title="&quot;GitHub Actions spending limit超過時はself-hostedランナーも含め全ジョブがブロックされる&quot;" data-text="症状 GitHub Actions の無料枠 (2,000 min/月) を使い切った後、 spending limit が $0 (デフォルト) の状態だと、 **self-hosted runner を指定したジョブも含めて全ワークフローが queued のまま実行されない。*ARC runner は正常稼働しているのにジョブが割り当てられない。 原因 GitHub は spending limit 超過時に請求防止のため **全ワークフローをブロック*する。 self-hosted runner は GitHub-hosted と異なりコンピュート費用はかからないが、 ジョブのキューイング・配信・ログ記録には GitHub インフラが必要で、 その処理も制限対象になる。 解決策 GitHub Settings → Billing &amp; plans → Spending limits で Actions の spending limit を $1 以上に設定する。 直接 URL: 月の上限を制限したい場合は $1〜$5 などの低い値に設定しておくと 予期しない大量課金を防ぎつつ se">
-                <a href="deployment/github-actions-spending-limit-blocks-all-runners.html">&quot;GitHub Actions spending limit超過時はself-hostedランナーも含め全ジョブがブロックされる&quot;</a>
+            <div class="error-card" data-tags="github-actions,billing,spending-limit,self-hosted-runner" data-title="GitHub Actions spending limit超過時はself-hostedランナーも含め全ジョブがブロックされる" data-text="症状 GitHub Actions の無料枠 (2,000 min/月) を使い切った後、 spending limit が $0 (デフォルト) の状態だと、 **self-hosted runner を指定したジョブも含めて全ワークフローが queued のまま実行されない。*ARC runner は正常稼働しているのにジョブが割り当てられない。 原因 GitHub は spending limit 超過時に請求防止のため **全ワークフローをブロック*する。 self-hosted runner は GitHub-hosted と異なりコンピュート費用はかからないが、 ジョブのキューイング・配信・ログ記録には GitHub インフラが必要で、 その処理も制限対象になる。 解決策 GitHub Settings → Billing &amp; plans → Spending limits で Actions の spending limit を $1 以上に設定する。 直接 URL: 月の上限を制限したい場合は $1〜$5 などの低い値に設定しておくと 予期しない大量課金を防ぎつつ se">
+                <a href="deployment/github-actions-spending-limit-blocks-all-runners.html">GitHub Actions spending limit超過時はself-hostedランナーも含め全ジョブがブロックされる</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-actions&quot;)">github-actions</span>
@@ -280,8 +280,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;spending-limit&quot;)">spending-limit</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;self-hosted-runner&quot;)">self-hosted-runner</span>
             </div>
-            <div class="error-card" data-tags="github-actions,arc,self-hosted-runner,organization" data-title="&quot;GitHub個人アカウントはorg-level self-hosted runner登録不可（404）&quot;" data-text="症状 ARC (Actions Runner Controller) の を (個人アカウント) に変更したところ、 AutoscalingListener が以下のエラーでcrash loopした。 原因 GitHub の self-hosted runner registration token エンドポイントは パスを使うが、個人アカウント ( ) は GitHub Organization ではないため404が返る。 個人アカウントがサポートするのはリポジトリレベルのランナーのみ ( )。 解決策 1. をリポジトリレベルに戻す: 2. crash loopしたARC resourcesをすべて削除してArgoCD再作成を待つ: 予防 org-level ARC runner には **GitHub Organization*アカウントが必要 個人アカウントで org-level 移行を計画している場合は 先に Organization を作成してから PAT スコープ で設定する PAT には + の両方が必要">
-                <a href="deployment/github-personal-account-no-org-runner.html">&quot;GitHub個人アカウントはorg-level self-hosted runner登録不可（404）&quot;</a>
+            <div class="error-card" data-tags="github-actions,arc,self-hosted-runner,organization" data-title="GitHub個人アカウントはorg-level self-hosted runner登録不可（404）" data-text="症状 ARC (Actions Runner Controller) の を (個人アカウント) に変更したところ、 AutoscalingListener が以下のエラーでcrash loopした。 原因 GitHub の self-hosted runner registration token エンドポイントは パスを使うが、個人アカウント ( ) は GitHub Organization ではないため404が返る。 個人アカウントがサポートするのはリポジトリレベルのランナーのみ ( )。 解決策 1. をリポジトリレベルに戻す: 2. crash loopしたARC resourcesをすべて削除してArgoCD再作成を待つ: 予防 org-level ARC runner には **GitHub Organization*アカウントが必要 個人アカウントで org-level 移行を計画している場合は 先に Organization を作成してから PAT スコープ で設定する PAT には + の両方が必要">
+                <a href="deployment/github-personal-account-no-org-runner.html">GitHub個人アカウントはorg-level self-hosted runner登録不可（404）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-actions&quot;)">github-actions</span>
@@ -289,8 +289,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;self-hosted-runner&quot;)">self-hosted-runner</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;organization&quot;)">organization</span>
             </div>
-            <div class="error-card" data-tags="nginx,docker,sakura-vps,https" data-title="&quot;nginx: acme.conf の server_name 指定ブロックが default_server より優先され 301 リダイレクトが効かない&quot;" data-text="症状 に + を設定したが、 が 301 ではなく 404 を返す。 原因 が同じホスト名（ ）で を持っており、 nginx の優先順位で 完全一致ブロックが より先にマッチする。 には が無いため、 は 404 になっていた。 解決策 （ホスト名指定の HTTP ブロック）に の 301 リダイレクトを追加： 予防 nginx で HTTP→HTTPS リダイレクトを設定する際、 だけでなく **そのホスト名を明示する全ての server ブロック**にリダイレクトを入れる。 で重複ブロックを事前確認する。">
-                <a href="deployment/nginx-acme-conf-overrides-default-server.html">&quot;nginx: acme.conf の server_name 指定ブロックが default_server より優先され 301 リダイレクトが効かない&quot;</a>
+            <div class="error-card" data-tags="nginx,docker,sakura-vps,https" data-title="nginx: acme.conf の server_name 指定ブロックが default_server より優先され 301 リダイレクトが効かない" data-text="症状 に + を設定したが、 が 301 ではなく 404 を返す。 原因 が同じホスト名（ ）で を持っており、 nginx の優先順位で 完全一致ブロックが より先にマッチする。 には が無いため、 は 404 になっていた。 解決策 （ホスト名指定の HTTP ブロック）に の 301 リダイレクトを追加： 予防 nginx で HTTP→HTTPS リダイレクトを設定する際、 だけでなく **そのホスト名を明示する全ての server ブロック**にリダイレクトを入れる。 で重複ブロックを事前確認する。">
+                <a href="deployment/nginx-acme-conf-overrides-default-server.html">nginx: acme.conf の server_name 指定ブロックが default_server より優先され 301 リダイレクトが効かない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;nginx&quot;)">nginx</span>
@@ -298,8 +298,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;sakura-vps&quot;)">sakura-vps</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;https&quot;)">https</span>
             </div>
-            <div class="error-card" data-tags="deployment" data-title="&quot;Qdrant K8s probe で /readiness が 404 になる&quot;" data-text="症状 Kubernetes の / / に を指定すると HTTP 404 が返り、Pod が ループに入る。 原因 Qdrant は エンドポイントを提供していない。 正しいエンドポイントは以下： 対処 k8s manifest を修正： 確認方法 参考 Qdrant 公式ドキュメント: https://qdrant.tech/documentation/guides/administration/ 修正 PR: fix/qdrant-probe-endpoints ブランチ（Issue #92）">
-                <a href="deployment/qdrant-probe-endpoints-404.html">&quot;Qdrant K8s probe で /readiness が 404 になる&quot;</a>
+            <div class="error-card" data-tags="deployment" data-title="Qdrant K8s probe で /readiness が 404 になる" data-text="症状 Kubernetes の / / に を指定すると HTTP 404 が返り、Pod が ループに入る。 原因 Qdrant は エンドポイントを提供していない。 正しいエンドポイントは以下： 対処 k8s manifest を修正： 確認方法 参考 Qdrant 公式ドキュメント: https://qdrant.tech/documentation/guides/administration/ 修正 PR: fix/qdrant-probe-endpoints ブランチ（Issue #92）">
+                <a href="deployment/qdrant-probe-endpoints-404.html">Qdrant K8s probe で /readiness が 404 になる</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;deployment&quot;)">deployment</span>
@@ -307,8 +307,8 @@
         </div>
         <div class="category">
             <h3>📁 GITHUB</h3>
-            <div class="error-card" data-tags="github,pr,issue,auto-close,gotcha" data-title="&quot;PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない&quot;" data-text="PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない 症状 と書いたコミットで PR を default ブランチにマージしたが、 自動クローズされたのは **#2 だけ**。#3-#7 は OPEN のまま残った。 PR 本文の でも同様に先頭しか閉じない。 原因 GitHub の Issue 自動クローズは **「キーワード + 単一の Issue 番号」*のペアしか解釈しない。 1 つのキーワードに番号をスペース区切り・カンマ区切りで並べても、後続の番号は プレーンな参照（リンク）として扱われ、クローズ対象にならない。 解決策 各 Issue 番号に対してキーワードを繰り返す。 取りこぼした場合は手動クローズで復旧できる。 予防 PR 本文/コミットで複数 Issue を閉じるときは **1 番号ごとにキーワードを書く*マージ後は必ず対象 Issue の state を確認する（ ） 対応: / は NG、 を行ごとに列挙が正">
-                <a href="github/close-keyword-one-issue-per-keyword.html">&quot;PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない&quot;</a>
+            <div class="error-card" data-tags="github,pr,issue,auto-close,gotcha" data-title="PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない" data-text="PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない 症状 と書いたコミットで PR を default ブランチにマージしたが、 自動クローズされたのは **#2 だけ**。#3-#7 は OPEN のまま残った。 PR 本文の でも同様に先頭しか閉じない。 原因 GitHub の Issue 自動クローズは **「キーワード + 単一の Issue 番号」*のペアしか解釈しない。 1 つのキーワードに番号をスペース区切り・カンマ区切りで並べても、後続の番号は プレーンな参照（リンク）として扱われ、クローズ対象にならない。 解決策 各 Issue 番号に対してキーワードを繰り返す。 取りこぼした場合は手動クローズで復旧できる。 予防 PR 本文/コミットで複数 Issue を閉じるときは **1 番号ごとにキーワードを書く*マージ後は必ず対象 Issue の state を確認する（ ） 対応: / は NG、 を行ごとに列挙が正">
+                <a href="github/close-keyword-one-issue-per-keyword.html">PR/コミットの close キーワードで複数 Issue を並べても先頭しか閉じない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
@@ -317,16 +317,16 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;auto-close&quot;)">auto-close</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;gotcha&quot;)">gotcha</span>
             </div>
-            <div class="error-card" data-tags="github-actions,branch-protection,auto-fix" data-title="&quot;GITHUB_TOKEN の bot push は workflow を起動せず required checks が付かない&quot;" data-text="症状 PR の required checks（build/lint/test/type-check）が成功しているのに 「the base branch policy prohibits the merge」でマージ不可。 原因 Auto Fix workflow が GITHUB_TOKEN で整形コミットを push → head SHA が進む。 GitHub の再帰防止仕様により **GITHUB_TOKEN で作られた push は workflow を起動しない**ため、新 head に check-run が一切付かない。 解決策 自分のトークンで empty commit を push して CI を再発火: 恒久対策は Issue #167（auto-fix の push を PAT 化）。 予防 required checks が「無い」のと「失敗」は区別する。 で head に付いた check-run を直接見る bot が push する workflow を作るときは、後続 CI の発火まで設計に含める">
-                <a href="github/github-token-push-no-workflow-trigger.html">&quot;GITHUB_TOKEN の bot push は workflow を起動せず required checks が付かない&quot;</a>
+            <div class="error-card" data-tags="github-actions,branch-protection,auto-fix" data-title="GITHUB_TOKEN の bot push は workflow を起動せず required checks が付かない" data-text="症状 PR の required checks（build/lint/test/type-check）が成功しているのに 「the base branch policy prohibits the merge」でマージ不可。 原因 Auto Fix workflow が GITHUB_TOKEN で整形コミットを push → head SHA が進む。 GitHub の再帰防止仕様により **GITHUB_TOKEN で作られた push は workflow を起動しない**ため、新 head に check-run が一切付かない。 解決策 自分のトークンで empty commit を push して CI を再発火: 恒久対策は Issue #167（auto-fix の push を PAT 化）。 予防 required checks が「無い」のと「失敗」は区別する。 で head に付いた check-run を直接見る bot が push する workflow を作るときは、後続 CI の発火まで設計に含める">
+                <a href="github/github-token-push-no-workflow-trigger.html">GITHUB_TOKEN の bot push は workflow を起動せず required checks が付かない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-actions&quot;)">github-actions</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;branch-protection&quot;)">branch-protection</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;auto-fix&quot;)">auto-fix</span>
             </div>
-            <div class="error-card" data-tags="github,pr,merge,stacked-pr" data-title="&quot;stacked PR を base 未確認でマージし master に入らなかった（PR #148）&quot;" data-text="症状 が成功し Issue も自動クローズされたのに、変更が master に無い。 原因 PR #148 の base が （stacked PR）だった。base の PR #147 を マージではなく **close*したため GitHub の自動 retarget が働かず、base が feature ブランチのまま残っていた。マージは成功したが行き先が master ではなかった。 解決策 master から新ブランチを切り、必要ファイルを Git Data API で単一コミット化して 別 PR（#166）として復旧マージ。 予防 マージ前に必ず base を確認する: stacked PR の親を close する場合、子 PR の base を手動で retarget する: 「MERGED = master に入った」ではない。マージ後は で確認できる">
-                <a href="github/stacked-pr-base-merge-wrong-target.html">&quot;stacked PR を base 未確認でマージし master に入らなかった（PR #148）&quot;</a>
+            <div class="error-card" data-tags="github,pr,merge,stacked-pr" data-title="stacked PR を base 未確認でマージし master に入らなかった（PR #148）" data-text="症状 が成功し Issue も自動クローズされたのに、変更が master に無い。 原因 PR #148 の base が （stacked PR）だった。base の PR #147 を マージではなく **close*したため GitHub の自動 retarget が働かず、base が feature ブランチのまま残っていた。マージは成功したが行き先が master ではなかった。 解決策 master から新ブランチを切り、必要ファイルを Git Data API で単一コミット化して 別 PR（#166）として復旧マージ。 予防 マージ前に必ず base を確認する: stacked PR の親を close する場合、子 PR の base を手動で retarget する: 「MERGED = master に入った」ではない。マージ後は で確認できる">
+                <a href="github/stacked-pr-base-merge-wrong-target.html">stacked PR を base 未確認でマージし master に入らなかった（PR #148）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
@@ -334,8 +334,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;merge&quot;)">merge</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;stacked-pr&quot;)">stacked-pr</span>
             </div>
-            <div class="error-card" data-tags="github,git,authentication,gopass" data-title="&quot;yukilabs-core リポジトリへの push が 403 になる&quot;" data-text="症状 SSH でも同様に denied（dev-teams-ordeamo アカウント）。 原因 CLI は アカウントで認証 → yukilabs-core org に READ のみ SSH キーは に紐づくが、こちらも yukilabs-core への push 権限なし keyring に flipslidersand 認証が保存されており、credential helper を上書きしてしまう 解決策 gopass に登録済みの yukilabs-core PAT を URL に直接埋め込む。 予防 yukilabs-core 配下のリポジトリは毎回この方法で push する。 remote URL を SSH に変更しても解決しないので注意。">
-                <a href="github/yukilabs-core-push-auth.html">&quot;yukilabs-core リポジトリへの push が 403 になる&quot;</a>
+            <div class="error-card" data-tags="github,git,authentication,gopass" data-title="yukilabs-core リポジトリへの push が 403 になる" data-text="症状 SSH でも同様に denied（dev-teams-ordeamo アカウント）。 原因 CLI は アカウントで認証 → yukilabs-core org に READ のみ SSH キーは に紐づくが、こちらも yukilabs-core への push 権限なし keyring に flipslidersand 認証が保存されており、credential helper を上書きしてしまう 解決策 gopass に登録済みの yukilabs-core PAT を URL に直接埋め込む。 予防 yukilabs-core 配下のリポジトリは毎回この方法で push する。 remote URL を SSH に変更しても解決しないので注意。">
+                <a href="github/yukilabs-core-push-auth.html">yukilabs-core リポジトリへの push が 403 になる</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
@@ -346,8 +346,8 @@
         </div>
         <div class="category">
             <h3>📁 GO</h3>
-            <div class="error-card" data-tags="go,benchmark,channel,goroutine" data-title="&quot;Go benchmark: defer cleanup() でドレイン goroutine がデッドロック&quot;" data-text="症状 / 内で pipe を使った benchmark を書き、 でパイプを閉じる + でドレイン goroutine の終了を待つ構造にすると benchmark が終わらずデッドロックする。 原因 はスコープ（関数）を抜けるまで実行されない。 でブロックしている間は関数が終わらないため も呼ばれず、 ドレイン goroutine は EOF を受け取れずに永遠にブロックする。 解決策 を の直前に明示的に呼ぶ。 を使う場合は より先に実行されるよう別関数に切り出すか、 クロージャ内で明示的に呼ぶ。 予防 benchmark でパイプ + ドレイン goroutine の組み合わせは ではなく 常に明示的 のパターンを使う。">
-                <a href="go/bench-deadlock-defer-cleanup-drain.html">&quot;Go benchmark: defer cleanup() でドレイン goroutine がデッドロック&quot;</a>
+            <div class="error-card" data-tags="go,benchmark,channel,goroutine" data-title="Go benchmark: defer cleanup() でドレイン goroutine がデッドロック" data-text="症状 / 内で pipe を使った benchmark を書き、 でパイプを閉じる + でドレイン goroutine の終了を待つ構造にすると benchmark が終わらずデッドロックする。 原因 はスコープ（関数）を抜けるまで実行されない。 でブロックしている間は関数が終わらないため も呼ばれず、 ドレイン goroutine は EOF を受け取れずに永遠にブロックする。 解決策 を の直前に明示的に呼ぶ。 を使う場合は より先に実行されるよう別関数に切り出すか、 クロージャ内で明示的に呼ぶ。 予防 benchmark でパイプ + ドレイン goroutine の組み合わせは ではなく 常に明示的 のパターンを使う。">
+                <a href="go/bench-deadlock-defer-cleanup-drain.html">Go benchmark: defer cleanup() でドレイン goroutine がデッドロック</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
@@ -355,20 +355,20 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;channel&quot;)">channel</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;goroutine&quot;)">goroutine</span>
             </div>
-            <div class="error-card" data-tags="go" data-title="&quot;master から分岐したブランチへの機能ポート手順&quot;" data-text="master から分岐したブランチへの機能ポート手順 状況 は master の round12/13 より前に分岐していた。 master で追加された TLS フィンガープリント基盤（#160 系）が存在しないため、 round11 ブランチで code-review した #207 等を実装するには先に基盤をポートする必要があった。 手順 1. master の該当ファイルを参照ソースとして使用（ サブディレクトリ） 2. ポートしたい関数・型を特定して新ファイルに実装 3. 依存関係（import 追加）を忘れずに追加 4. コンパイルエラーから依存を芋づる式に発見する merge 時のコンフリクト解消方針 セキュリティ修正・品質改善は HEAD（自分の実装）を保持 master が HEAD より進化させたテストファイルは で採用 両方に存在する機能（ vs 等）は master の関数名に統一 master にしかない新関数（ 等）は手動でマージ 注意 / 後は必ず + で確認 noise.go の → 変更時は 関数の存在確認 同一ファイルに重複定義が生まれる場合（par">
-                <a href="go/mesh-drop-branch-diverge-port.html">&quot;master から分岐したブランチへの機能ポート手順&quot;</a>
+            <div class="error-card" data-tags="go" data-title="master から分岐したブランチへの機能ポート手順" data-text="master から分岐したブランチへの機能ポート手順 状況 は master の round12/13 より前に分岐していた。 master で追加された TLS フィンガープリント基盤（#160 系）が存在しないため、 round11 ブランチで code-review した #207 等を実装するには先に基盤をポートする必要があった。 手順 1. master の該当ファイルを参照ソースとして使用（ サブディレクトリ） 2. ポートしたい関数・型を特定して新ファイルに実装 3. 依存関係（import 追加）を忘れずに追加 4. コンパイルエラーから依存を芋づる式に発見する merge 時のコンフリクト解消方針 セキュリティ修正・品質改善は HEAD（自分の実装）を保持 master が HEAD より進化させたテストファイルは で採用 両方に存在する機能（ vs 等）は master の関数名に統一 master にしかない新関数（ 等）は手動でマージ 注意 / 後は必ず + で確認 noise.go の → 変更時は 関数の存在確認 同一ファイルに重複定義が生まれる場合（par">
+                <a href="go/mesh-drop-branch-diverge-port.html">master から分岐したブランチへの機能ポート手順</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
             </div>
-            <div class="error-card" data-tags="go" data-title="&quot;gh pr edit が Projects (classic) 警告で exit 1 になる&quot;" data-text="gh pr edit が Projects (classic) 警告で exit 1 になる 症状 タイトル・本文は実際には更新されていない（API呼び出し自体が失敗している）。 原因 が Projects (classic) フィールドを取得する GraphQL クエリを内部で投げており、 deprecation エラーが返ってくると exit 1 になる。 回避策 REST API を直接叩く: 確認環境 gh version: 2.x 発生リポ: flipslidersand-labs/mesh-drop 日付: 2026-08-16">
-                <a href="go/mesh-drop-merge-conflict-gh-pr-edit.html">&quot;gh pr edit が Projects (classic) 警告で exit 1 になる&quot;</a>
+            <div class="error-card" data-tags="go" data-title="gh pr edit が Projects (classic) 警告で exit 1 になる" data-text="gh pr edit が Projects (classic) 警告で exit 1 になる 症状 タイトル・本文は実際には更新されていない（API呼び出し自体が失敗している）。 原因 が Projects (classic) フィールドを取得する GraphQL クエリを内部で投げており、 deprecation エラーが返ってくると exit 1 になる。 回避策 REST API を直接叩く: 確認環境 gh version: 2.x 発生リポ: flipslidersand-labs/mesh-drop 日付: 2026-08-16">
+                <a href="go/mesh-drop-merge-conflict-gh-pr-edit.html">gh pr edit が Projects (classic) 警告で exit 1 になる</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
             </div>
-            <div class="error-card" data-tags="go,git,merge-conflict,model-harbor" data-title="&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;" data-text="症状 PR #4 ( → ) と PR #5 ( → ) が同一機能（Bearer 認証）を別アーキテクチャで実装。PR #5 を master にマージ後、PR #4 をリベースすると でコンフリクト。 原因 PR #4: に を追加、 で + を使用 PR #5: パッケージを新設、 を スタイルに全面刷新 両者が の / 定義を競合 解決策 PR #5 の実装（httpapi パッケージ、fail-closed、カンマ区切り複数キー）が上位互換のため採用。PR #4 の を PR #5 版に差し替えてリベース完了後、古い PR をクローズ。 予防 同一リポジトリで複数セッションが同機能を実装しないよう Issue アサイン確認。 スタック PR（feat/A → feat/B → master）は後続 PR が先に master 入りすると必ずコンフリクト。直接 master をベースにするか worktree で分離する。">
-                <a href="go/model-harbor-pr-conflict-httpapi-router.html">&quot;model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト&quot;</a>
+            <div class="error-card" data-tags="go,git,merge-conflict,model-harbor" data-title="model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト" data-text="症状 PR #4 ( → ) と PR #5 ( → ) が同一機能（Bearer 認証）を別アーキテクチャで実装。PR #5 を master にマージ後、PR #4 をリベースすると でコンフリクト。 原因 PR #4: に を追加、 で + を使用 PR #5: パッケージを新設、 を スタイルに全面刷新 両者が の / 定義を競合 解決策 PR #5 の実装（httpapi パッケージ、fail-closed、カンマ区切り複数キー）が上位互換のため採用。PR #4 の を PR #5 版に差し替えてリベース完了後、古い PR をクローズ。 予防 同一リポジトリで複数セッションが同機能を実装しないよう Issue アサイン確認。 スタック PR（feat/A → feat/B → master）は後続 PR が先に master 入りすると必ずコンフリクト。直接 master をベースにするか worktree で分離する。">
+                <a href="go/model-harbor-pr-conflict-httpapi-router.html">model-harbor: feat/auth-middleware が httpapi パッケージ導入後にマージコンフリクト</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
@@ -376,8 +376,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;merge-conflict&quot;)">merge-conflict</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;model-harbor&quot;)">model-harbor</span>
             </div>
-            <div class="error-card" data-tags="go,race,sync,testing" data-title="&quot;sync.RWMutex: テストコードもロックを取らないと -race で検出される&quot;" data-text="症状 本番コードの package-level 変数読み取りを → に変更して / に更新したが、テストコードの同じ変数への直接アクセスが 残っており で data race が報告される。 原因 production code を直した後、test code での への直接読み取りを ロックで保護し忘れた。テストは同一パッケージにあるため package-private 変数に 直接アクセスできるが、race detector は白黒つけず全アクセスを検査する。 解決策 テストコード内でも package-level 変数を読む箇所に同じロックを取る。 予防 へ移行するときは production code だけでなく ファイル内の 同変数アクセス箇所も grep して全てロックを追加する。">
-                <a href="go/rwmutex-test-code-also-needs-lock.html">&quot;sync.RWMutex: テストコードもロックを取らないと -race で検出される&quot;</a>
+            <div class="error-card" data-tags="go,race,sync,testing" data-title="sync.RWMutex: テストコードもロックを取らないと -race で検出される" data-text="症状 本番コードの package-level 変数読み取りを → に変更して / に更新したが、テストコードの同じ変数への直接アクセスが 残っており で data race が報告される。 原因 production code を直した後、test code での への直接読み取りを ロックで保護し忘れた。テストは同一パッケージにあるため package-private 変数に 直接アクセスできるが、race detector は白黒つけず全アクセスを検査する。 解決策 テストコード内でも package-level 変数を読む箇所に同じロックを取る。 予防 へ移行するときは production code だけでなく ファイル内の 同変数アクセス箇所も grep して全てロックを追加する。">
+                <a href="go/rwmutex-test-code-also-needs-lock.html">sync.RWMutex: テストコードもロックを取らないと -race で検出される</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
@@ -388,40 +388,40 @@
         </div>
         <div class="category">
             <h3>📁 INFRA</h3>
-            <div class="error-card" data-tags="infra" data-title="&quot;ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり&quot;" data-text="ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり 発生日 2026-08-02 症状 にランナーポッドが起動しない GitHub broker が を返し続ける 多数のジョブが長時間 のまま 根本原因 namespace に2つの が混在していた。 クラッシュしている listener が ARC controller のリソースを消費し、正常な listener のスケーリングを阻害していた。 調査コマンド 修正 削除後、即座にランナーポッドが起動した。 予防策 ARC helm upgrade 後に で URL を確認する URL が と一致しているか検証する 関連 Issue #601: https://github.com/flipslidersand/dev-nodee-infrastructure/issues/601">
-                <a href="infra/arc-listener-wrong-url-crashloop.html">&quot;ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり&quot;</a>
+            <div class="error-card" data-tags="infra" data-title="ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり" data-text="ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり 発生日 2026-08-02 症状 にランナーポッドが起動しない GitHub broker が を返し続ける 多数のジョブが長時間 のまま 根本原因 namespace に2つの が混在していた。 クラッシュしている listener が ARC controller のリソースを消費し、正常な listener のスケーリングを阻害していた。 調査コマンド 修正 削除後、即座にランナーポッドが起動した。 予防策 ARC helm upgrade 後に で URL を確認する URL が と一致しているか検証する 関連 Issue #601: https://github.com/flipslidersand/dev-nodee-infrastructure/issues/601">
+                <a href="infra/arc-listener-wrong-url-crashloop.html">ARC AutoscalingListener が誤 URL で CrashLoop → ジョブ詰まり</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;infra&quot;)">infra</span>
             </div>
-            <div class="error-card" data-tags="infra" data-title="&quot;ARC runner label のスコープ分離（personal repo）&quot;" data-text="ARC runner label のスコープ分離（personal repo） 発生日 2026-08-02 症状 の CI が を指定しているのに、ジョブが永続的に のまま処理されない。 根本原因 GitHub personal account では runner はリポジトリレベルでスコープが分離される。 = に登録された ARC scale set のジョブは に登録された runner しか処理できない に登録されている runner のラベルは 確認方法 修正 の全 workflow の → に変更。 関連 PR #330: https://github.com/flipslidersand/dev-infrastructure/pull/330">
-                <a href="infra/arc-runner-label-scope-separation.html">&quot;ARC runner label のスコープ分離（personal repo）&quot;</a>
+            <div class="error-card" data-tags="infra" data-title="ARC runner label のスコープ分離（personal repo）" data-text="ARC runner label のスコープ分離（personal repo） 発生日 2026-08-02 症状 の CI が を指定しているのに、ジョブが永続的に のまま処理されない。 根本原因 GitHub personal account では runner はリポジトリレベルでスコープが分離される。 = に登録された ARC scale set のジョブは に登録された runner しか処理できない に登録されている runner のラベルは 確認方法 修正 の全 workflow の → に変更。 関連 PR #330: https://github.com/flipslidersand/dev-infrastructure/pull/330">
+                <a href="infra/arc-runner-label-scope-separation.html">ARC runner label のスコープ分離（personal repo）</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;infra&quot;)">infra</span>
             </div>
-            <div class="error-card" data-tags="infra" data-title="&quot;メモリ爆食いプロセスの特定・kill 手順&quot;" data-text="メモリ爆食いプロセスの特定・kill 手順 症状 システムがフリーズ / 応答遅延 で used が急増 手順 1. メモリ使用量ランキング確認 列が高いプロセスを確認する。 2. 何をしているか確認 コマンドライン引数がまるごと確認できる。 3. kill 4. リアルタイム監視 実例（2026-07-08） がメモリ 11.5GB + CPU 100% で爆走。 クラッシュダンプ ( ) がプロジェクトルートに生成されていた。 原因: クローラーのメモリリーク。 を減らすか、バッチ処理に組み直す必要あり。">
-                <a href="infra/memory-runaway-process-debug.html">&quot;メモリ爆食いプロセスの特定・kill 手順&quot;</a>
+            <div class="error-card" data-tags="infra" data-title="メモリ爆食いプロセスの特定・kill 手順" data-text="メモリ爆食いプロセスの特定・kill 手順 症状 システムがフリーズ / 応答遅延 で used が急増 手順 1. メモリ使用量ランキング確認 列が高いプロセスを確認する。 2. 何をしているか確認 コマンドライン引数がまるごと確認できる。 3. kill 4. リアルタイム監視 実例（2026-07-08） がメモリ 11.5GB + CPU 100% で爆走。 クラッシュダンプ ( ) がプロジェクトルートに生成されていた。 原因: クローラーのメモリリーク。 を減らすか、バッチ処理に組み直す必要あり。">
+                <a href="infra/memory-runaway-process-debug.html">メモリ爆食いプロセスの特定・kill 手順</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;infra&quot;)">infra</span>
             </div>
-            <div class="error-card" data-tags="vault,sakura-vps,docker" data-title="&quot;Sakura VPS の Vault は Docker 内にあり、ホストに vault バイナリがない&quot;" data-text="症状 SSH で Sakura VPS に入り を実行すると が出る。 原因 VPS ホストには vault バイナリがインストールされていない。 Vault は という Docker コンテナとして稼働しており、コンテナ内にのみバイナリがある。 解決策 トークンは gopass から取得: 予防 SSH 後に で確認する前に、まず でコンテナ確認 は権限が限定的（403 になる場合あり）。管理操作は を使う ローカルから SSH トンネル経由で Vault に接続したい場合:">
-                <a href="infra/vault-on-sakura-docker-exec-required.html">&quot;Sakura VPS の Vault は Docker 内にあり、ホストに vault バイナリがない&quot;</a>
+            <div class="error-card" data-tags="vault,sakura-vps,docker" data-title="Sakura VPS の Vault は Docker 内にあり、ホストに vault バイナリがない" data-text="症状 SSH で Sakura VPS に入り を実行すると が出る。 原因 VPS ホストには vault バイナリがインストールされていない。 Vault は という Docker コンテナとして稼働しており、コンテナ内にのみバイナリがある。 解決策 トークンは gopass から取得: 予防 SSH 後に で確認する前に、まず でコンテナ確認 は権限が限定的（403 になる場合あり）。管理操作は を使う ローカルから SSH トンネル経由で Vault に接続したい場合:">
+                <a href="infra/vault-on-sakura-docker-exec-required.html">Sakura VPS の Vault は Docker 内にあり、ホストに vault バイナリがない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vault&quot;)">vault</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;sakura-vps&quot;)">sakura-vps</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;docker&quot;)">docker</span>
             </div>
-            <div class="error-card" data-tags="infra" data-title="&quot;Vault sync — tar --strip-components 数が不足でネストディレクトリが発生&quot;" data-text="Vault sync — tar --strip-components 数が不足でネストディレクトリが発生 現象 が を返す。 が空。 原因 は 構造を出力する。 では が展開先 に対して になる（ がネスト）。 正しくは で になる。 修正 関連 MINIPC: vault-standby は再起動後に手動 unseal が必要（自動 unseal なし） unseal keys: （しきい値 t=2）">
-                <a href="infra/vault-sync-strip-components.html">&quot;Vault sync — tar --strip-components 数が不足でネストディレクトリが発生&quot;</a>
+            <div class="error-card" data-tags="infra" data-title="Vault sync — tar --strip-components 数が不足でネストディレクトリが発生" data-text="Vault sync — tar --strip-components 数が不足でネストディレクトリが発生 現象 が を返す。 が空。 原因 は 構造を出力する。 では が展開先 に対して になる（ がネスト）。 正しくは で になる。 修正 関連 MINIPC: vault-standby は再起動後に手動 unseal が必要（自動 unseal なし） unseal keys: （しきい値 t=2）">
+                <a href="infra/vault-sync-strip-components.html">Vault sync — tar --strip-components 数が不足でネストディレクトリが発生</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;infra&quot;)">infra</span>
             </div>
-            <div class="error-card" data-tags="vps,ssh,fail2ban,bruteforce,sakura" data-title="&quot;VPS の SSH が timeout — sshd は正常稼働、原因はブルートフォース + fail2ban 停止&quot;" data-text="症状 sakura VPS の port 22 が全クライアントから connection timed out。 ping は応答あり。VNC コンソールで確認すると **sshd は正常に listen 中**、 fail2ban の ban は 0、UFW も 22/tcp ALLOW Anywhere のまま。 設定を何も変えていないのに、しばらくして接続が回復した。 原因（最有力） 1. **fail2ban が停止していた**（socket エラー。自動起動も disabled だった） 2. 無防備な状態で複数 IP からパスワード総当たり攻撃が継続 3. 未認証接続が滞留し sshd の **MaxStartups（10-100）が飽和*→ 新規接続がドロップされ、外部からは timeout に見えた 4. 攻撃側の接続が減った時点で自然回復（設定変更なしで復旧した理由） MINIPC の autossh が 112 回連続リトライしていたのも接続枠の圧迫要因。 解決策 VNC コンソール（さくら Web 管理画面 → コンソール）で内部から診断 → 即座に攻撃元 IP ">
-                <a href="infra/vps-ssh-timeout-bruteforce-maxstartups.html">&quot;VPS の SSH が timeout — sshd は正常稼働、原因はブルートフォース + fail2ban 停止&quot;</a>
+            <div class="error-card" data-tags="vps,ssh,fail2ban,bruteforce,sakura" data-title="VPS の SSH が timeout — sshd は正常稼働、原因はブルートフォース + fail2ban 停止" data-text="症状 sakura VPS の port 22 が全クライアントから connection timed out。 ping は応答あり。VNC コンソールで確認すると **sshd は正常に listen 中**、 fail2ban の ban は 0、UFW も 22/tcp ALLOW Anywhere のまま。 設定を何も変えていないのに、しばらくして接続が回復した。 原因（最有力） 1. **fail2ban が停止していた**（socket エラー。自動起動も disabled だった） 2. 無防備な状態で複数 IP からパスワード総当たり攻撃が継続 3. 未認証接続が滞留し sshd の **MaxStartups（10-100）が飽和*→ 新規接続がドロップされ、外部からは timeout に見えた 4. 攻撃側の接続が減った時点で自然回復（設定変更なしで復旧した理由） MINIPC の autossh が 112 回連続リトライしていたのも接続枠の圧迫要因。 解決策 VNC コンソール（さくら Web 管理画面 → コンソール）で内部から診断 → 即座に攻撃元 IP ">
+                <a href="infra/vps-ssh-timeout-bruteforce-maxstartups.html">VPS の SSH が timeout — sshd は正常稼働、原因はブルートフォース + fail2ban 停止</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vps&quot;)">vps</span>
@@ -430,8 +430,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;bruteforce&quot;)">bruteforce</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;sakura&quot;)">sakura</span>
             </div>
-            <div class="error-card" data-tags="infra" data-title="&quot;WSL2 で sudo パスワード不要で systemd サービスを登録する方法&quot;" data-text="WSL2 で sudo パスワード不要で systemd サービスを登録する方法 発生日 2026-08-02 症状 SSH 経由の非インタラクティブセッションでは がパスワードを要求し、 systemd サービスファイルの書き込み・登録ができない。 解決策 を使って root ユーザーとして直接コマンドを実行する。 WSL2 では フラグで sudo なしに root シェルが起動できる。 前提 Windows ホスト上で が許可されている（デフォルトで許可） WSL2 の に が設定済み 注意 heredoc 内でシェル変数展開が必要な場合は ではなく （クォートなし）を使う。 ただし SSH コマンドのクォートと混在するとエスケープが複雑になるため、 内容はファイルで管理して 経由にするのが安全。 関連 Issue #329: arc-dev-pc-yuki systemd 永続化">
-                <a href="infra/wsl2-systemd-sudo-workaround.html">&quot;WSL2 で sudo パスワード不要で systemd サービスを登録する方法&quot;</a>
+            <div class="error-card" data-tags="infra" data-title="WSL2 で sudo パスワード不要で systemd サービスを登録する方法" data-text="WSL2 で sudo パスワード不要で systemd サービスを登録する方法 発生日 2026-08-02 症状 SSH 経由の非インタラクティブセッションでは がパスワードを要求し、 systemd サービスファイルの書き込み・登録ができない。 解決策 を使って root ユーザーとして直接コマンドを実行する。 WSL2 では フラグで sudo なしに root シェルが起動できる。 前提 Windows ホスト上で が許可されている（デフォルトで許可） WSL2 の に が設定済み 注意 heredoc 内でシェル変数展開が必要な場合は ではなく （クォートなし）を使う。 ただし SSH コマンドのクォートと混在するとエスケープが複雑になるため、 内容はファイルで管理して 経由にするのが安全。 関連 Issue #329: arc-dev-pc-yuki systemd 永続化">
+                <a href="infra/wsl2-systemd-sudo-workaround.html">WSL2 で sudo パスワード不要で systemd サービスを登録する方法</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;infra&quot;)">infra</span>
@@ -439,14 +439,14 @@
         </div>
         <div class="category">
             <h3>📁 JAVASCRIPT</h3>
-            <div class="error-card" data-tags="javascript" data-title="&quot;err.message をレスポンスに直接渡すパターンの漏洩&quot;" data-text="err.message をレスポンスに直接渡すパターンの漏洩 **発生プロジェクト**: **関連 Issue**: #605 (fix) / #606 (prevention) **発見日**: 2026-08-02 --事象 の 503 パスで がそのままクライアントに返されていた。 --見落とし原因（#414 セキュリティ監査で検出できなかった理由） 1. **監査スコープが不完全**: のみを確認し 配下を網羅していなかった 2. **テスト不足**: 503 パスのテストは status code のみ検証していた（ フィールドの中身を検証していなかった） 3. **catch ブロックのパターン盲点**: 正常系コードレビュー中心で、catch ブロック内のレスポンスに注意が向きにくい --修正内容 の 503/500 エラーパスで静的メッセージに変更。 は がある場合（意図的な構造化エラー）のみ を使用。 --再発防止チェックリスト セキュリティ監査・コードレビュー時に ブロック内を必ず確認する: [ ] に / / を直接渡していないか [ ] 500/503 レスポン">
-                <a href="javascript/err-message-response-leak.html">&quot;err.message をレスポンスに直接渡すパターンの漏洩&quot;</a>
+            <div class="error-card" data-tags="javascript" data-title="err.message をレスポンスに直接渡すパターンの漏洩" data-text="err.message をレスポンスに直接渡すパターンの漏洩 **発生プロジェクト**: **関連 Issue**: #605 (fix) / #606 (prevention) **発見日**: 2026-08-02 --事象 の 503 パスで がそのままクライアントに返されていた。 --見落とし原因（#414 セキュリティ監査で検出できなかった理由） 1. **監査スコープが不完全**: のみを確認し 配下を網羅していなかった 2. **テスト不足**: 503 パスのテストは status code のみ検証していた（ フィールドの中身を検証していなかった） 3. **catch ブロックのパターン盲点**: 正常系コードレビュー中心で、catch ブロック内のレスポンスに注意が向きにくい --修正内容 の 503/500 エラーパスで静的メッセージに変更。 は がある場合（意図的な構造化エラー）のみ を使用。 --再発防止チェックリスト セキュリティ監査・コードレビュー時に ブロック内を必ず確認する: [ ] に / / を直接渡していないか [ ] 500/503 レスポン">
+                <a href="javascript/err-message-response-leak.html">err.message をレスポンスに直接渡すパターンの漏洩</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;javascript&quot;)">javascript</span>
             </div>
-            <div class="error-card" data-tags="nextjs,react,state-management,browser-navigation,async" data-title="&quot;Next.js: Browser back button causes infinite loading state&quot;" data-text="Next.js: ブラウザ戻るボタンで無限ローディング状態 症状 詳細ページからダッシュボードに戻るときにブラウザの戻るボタンを使用すると、ページが無限ローディング状態のままハングする。F5（完全リロード）を押すまで応答しない。 原因 ✅ **マウント/アンマウント時のレースコンディション*ブラウザ戻るボタン使用時に、コンポーネント破棄と非同期処理の完了タイミングがズレる ✅ **アンマウント後の状態更新試行*破棄されたコンポーネントに対して state を設定しようとする ✅ **メモリリーク：クローズされない Promise*fetch 完了後の state 更新が pending のまま残る ✅ **cleanup 欠落*useEffect で適切に cleanup 関数を定義していない 解決策 1. DecisionLogList Component に を追加 2. Timeout 機構で強制的にローディングを終了 3. useAuth Hook で isMounted フラグを使用 4. AbortController で fetch をキャンセル（推奨） 予防 [ ] *">
-                <a href="javascript/nextjs-browser-back-button-infinite-load.html">&quot;Next.js: Browser back button causes infinite loading state&quot;</a>
+            <div class="error-card" data-tags="nextjs,react,state-management,browser-navigation,async" data-title="Next.js: Browser back button causes infinite loading state" data-text="Next.js: ブラウザ戻るボタンで無限ローディング状態 症状 詳細ページからダッシュボードに戻るときにブラウザの戻るボタンを使用すると、ページが無限ローディング状態のままハングする。F5（完全リロード）を押すまで応答しない。 原因 ✅ **マウント/アンマウント時のレースコンディション*ブラウザ戻るボタン使用時に、コンポーネント破棄と非同期処理の完了タイミングがズレる ✅ **アンマウント後の状態更新試行*破棄されたコンポーネントに対して state を設定しようとする ✅ **メモリリーク：クローズされない Promise*fetch 完了後の state 更新が pending のまま残る ✅ **cleanup 欠落*useEffect で適切に cleanup 関数を定義していない 解決策 1. DecisionLogList Component に を追加 2. Timeout 機構で強制的にローディングを終了 3. useAuth Hook で isMounted フラグを使用 4. AbortController で fetch をキャンセル（推奨） 予防 [ ] *">
+                <a href="javascript/nextjs-browser-back-button-infinite-load.html">Next.js: Browser back button causes infinite loading state</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;nextjs&quot;)">nextjs</span>
@@ -455,8 +455,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;browser-navigation&quot;)">browser-navigation</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;async&quot;)">async</span>
             </div>
-            <div class="error-card" data-tags="vite,react,tailwind,postcss,css,v4,configuration" data-title="&quot;Vite: GET /src/index.css net::ERR_ABORTED 500 (Tailwind CSS v4 PostCSS)&quot;" data-text="Vite: CSS 500 エラー（Tailwind v4 PostCSS 設定不正） 症状 ブラウザコンソールに以下のエラー： ターミナルには エラーが出力： あるいは： CSS が読み込まれず、ページが完全にスタイルなし状態で表示される。 原因 Tailwind CSS v4 では PostCSS の設定方式が変更された： ✅ **v3 (旧方式)**: + を手動で設定 ✅ **v4 (新方式)**: PostCSS が不要。CSS ファイルで を使用 このプロジェクトでは旧方式の設定（ 、 ）がある状態で Tailwind v4 を導入しようとしたため、プラグイン認識エラーが発生した。 さらに に directives が残っていると、PostCSS が処理方法を見失う。 解決策 試した失敗パターン 最終的な解決方法（成功） **Tailwind と PostCSS 関連の設定ファイルを完全削除する***CSS ファイルから directives を削除*代替手段 Tailwind が不要な場合（このプロジェクトでは不要）： 予防 [ ] **Tailwind CSS の導入は">
-                <a href="javascript/tailwind-v4-postcss-500-error.html">&quot;Vite: GET /src/index.css net::ERR_ABORTED 500 (Tailwind CSS v4 PostCSS)&quot;</a>
+            <div class="error-card" data-tags="vite,react,tailwind,postcss,css,v4,configuration" data-title="Vite: GET /src/index.css net::ERR_ABORTED 500 (Tailwind CSS v4 PostCSS)" data-text="Vite: CSS 500 エラー（Tailwind v4 PostCSS 設定不正） 症状 ブラウザコンソールに以下のエラー： ターミナルには エラーが出力： あるいは： CSS が読み込まれず、ページが完全にスタイルなし状態で表示される。 原因 Tailwind CSS v4 では PostCSS の設定方式が変更された： ✅ **v3 (旧方式)**: + を手動で設定 ✅ **v4 (新方式)**: PostCSS が不要。CSS ファイルで を使用 このプロジェクトでは旧方式の設定（ 、 ）がある状態で Tailwind v4 を導入しようとしたため、プラグイン認識エラーが発生した。 さらに に directives が残っていると、PostCSS が処理方法を見失う。 解決策 試した失敗パターン 最終的な解決方法（成功） **Tailwind と PostCSS 関連の設定ファイルを完全削除する***CSS ファイルから directives を削除*代替手段 Tailwind が不要な場合（このプロジェクトでは不要）： 予防 [ ] **Tailwind CSS の導入は">
+                <a href="javascript/tailwind-v4-postcss-500-error.html">Vite: GET /src/index.css net::ERR_ABORTED 500 (Tailwind CSS v4 PostCSS)</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vite&quot;)">vite</span>
@@ -467,8 +467,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;v4&quot;)">v4</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;configuration&quot;)">configuration</span>
             </div>
-            <div class="error-card" data-tags="vite,react,typescript,esm,multi-file,cache,bundling" data-title="&quot;Vite: Complex multi-file export chaos (TypeScript not recognized)&quot;" data-text="Vite: 複合エラー（複数ファイル分散による export 認識失敗） 症状 複数の症状が同時に発生： 1. **Named Export エラー*2. **TypeScript ファイルがブラウザで認識されない*3. **ホットモジュールリロード（HMR）が動作しない*ファイル保存時にブラウザが更新されない サーバーを再起動してもエラー消えない 原因 Vite の ESM（ECMAScript Modules）モジュール解決が、複雑な依存関係を持つ複数ファイル構成に対応できなくなった： このような **循環参照*または **相互参照*が生じると： Vite のキャッシュ（ ）に矛盾した情報が残る モジュール解決が失敗する TypeScript の型情報がブラウザに伝わらない HMR が機能停止 解決策 試した失敗パターン（すべて無効） **これらはすべて一時的な効果しかなく、ファイル保存時に再発する*最終的な解決方法（成功） **コンポーネント・型・ユーティリティを全て単一ファイルに統合する*ファイル構成を以下のように変更： App.tsx に以下を統合： 重要なポイント 1. *">
-                <a href="javascript/vite-esm-multi-file-export-chaos.html">&quot;Vite: Complex multi-file export chaos (TypeScript not recognized)&quot;</a>
+            <div class="error-card" data-tags="vite,react,typescript,esm,multi-file,cache,bundling" data-title="Vite: Complex multi-file export chaos (TypeScript not recognized)" data-text="Vite: 複合エラー（複数ファイル分散による export 認識失敗） 症状 複数の症状が同時に発生： 1. **Named Export エラー*2. **TypeScript ファイルがブラウザで認識されない*3. **ホットモジュールリロード（HMR）が動作しない*ファイル保存時にブラウザが更新されない サーバーを再起動してもエラー消えない 原因 Vite の ESM（ECMAScript Modules）モジュール解決が、複雑な依存関係を持つ複数ファイル構成に対応できなくなった： このような **循環参照*または **相互参照*が生じると： Vite のキャッシュ（ ）に矛盾した情報が残る モジュール解決が失敗する TypeScript の型情報がブラウザに伝わらない HMR が機能停止 解決策 試した失敗パターン（すべて無効） **これらはすべて一時的な効果しかなく、ファイル保存時に再発する*最終的な解決方法（成功） **コンポーネント・型・ユーティリティを全て単一ファイルに統合する*ファイル構成を以下のように変更： App.tsx に以下を統合： 重要なポイント 1. *">
+                <a href="javascript/vite-esm-multi-file-export-chaos.html">Vite: Complex multi-file export chaos (TypeScript not recognized)</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vite&quot;)">vite</span>
@@ -479,8 +479,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;cache&quot;)">cache</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;bundling&quot;)">bundling</span>
             </div>
-            <div class="error-card" data-tags="vite,react,typescript,esm,named-export,cache,module-resolution" data-title="&quot;Vite: The requested module does not provide an export named &#x27;Priority&#x27;&quot;" data-text="Vite: モジュール named export エラー（Priority 認識されない） 症状 ブラウザコンソールで以下のエラーが表示： App.tsx で 型を import しようとすると、モジュール解決が失敗する。 原因 ✅ 型定義を複数ファイルに分散（ + 他ファイル） Vite のモジュール解決機構がファイル間の import/export 関係を正しく追跡できない Vite キャッシュ（ フォルダ）に古い状態が残っている ESM モジュール解決で複雑な依存関係が競合 解決策 試した失敗パターン 最終的な解決方法（成功） **型定義を単一ファイルに統合する*App.tsx で import: 重要なポイント 1. **複数の型定義ファイルを避ける*、 など複数ファイルの分散は避ける すべて 1 ファイルに統合 2. **初期セットアップは単一ファイル実装*にコンポーネント・型・ロジックをまとめる 動作確認後に段階的に分割 予防 [ ] **初期段階では単一ファイル実装を原則とする*[ ] **型定義は絶対に複数ファイル分散しない*[ ] **Vite キャッシュを定期的にク">
-                <a href="javascript/vite-named-export-not-found.html">&quot;Vite: The requested module does not provide an export named &#x27;Priority&#x27;&quot;</a>
+            <div class="error-card" data-tags="vite,react,typescript,esm,named-export,cache,module-resolution" data-title="Vite: The requested module does not provide an export named &#x27;Priority&#x27;" data-text="Vite: モジュール named export エラー（Priority 認識されない） 症状 ブラウザコンソールで以下のエラーが表示： App.tsx で 型を import しようとすると、モジュール解決が失敗する。 原因 ✅ 型定義を複数ファイルに分散（ + 他ファイル） Vite のモジュール解決機構がファイル間の import/export 関係を正しく追跡できない Vite キャッシュ（ フォルダ）に古い状態が残っている ESM モジュール解決で複雑な依存関係が競合 解決策 試した失敗パターン 最終的な解決方法（成功） **型定義を単一ファイルに統合する*App.tsx で import: 重要なポイント 1. **複数の型定義ファイルを避ける*、 など複数ファイルの分散は避ける すべて 1 ファイルに統合 2. **初期セットアップは単一ファイル実装*にコンポーネント・型・ロジックをまとめる 動作確認後に段階的に分割 予防 [ ] **初期段階では単一ファイル実装を原則とする*[ ] **型定義は絶対に複数ファイル分散しない*[ ] **Vite キャッシュを定期的にク">
+                <a href="javascript/vite-named-export-not-found.html">Vite: The requested module does not provide an export named &#x27;Priority&#x27;</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vite&quot;)">vite</span>
@@ -491,8 +491,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;cache&quot;)">cache</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;module-resolution&quot;)">module-resolution</span>
             </div>
-            <div class="error-card" data-tags="vitest,mocking,hoisting" data-title="&quot;vi.mock ファクトリ内で外部変数を参照できない&quot;" data-text="症状 原因 はファイル先頭にホイストされる。 そのため、ファクトリ関数内で のような変数を参照すると、 変数の初期化より前に実行されて ReferenceError になる。 解決策 でモックオブジェクトを事前定義する。 予防 ルートテスト変数を ファクトリが参照する場合は必ず を使う。">
-                <a href="javascript/vitest-mock-hoisting.html">&quot;vi.mock ファクトリ内で外部変数を参照できない&quot;</a>
+            <div class="error-card" data-tags="vitest,mocking,hoisting" data-title="vi.mock ファクトリ内で外部変数を参照できない" data-text="症状 原因 はファイル先頭にホイストされる。 そのため、ファクトリ関数内で のような変数を参照すると、 変数の初期化より前に実行されて ReferenceError になる。 解決策 でモックオブジェクトを事前定義する。 予防 ルートテスト変数を ファクトリが参照する場合は必ず を使う。">
+                <a href="javascript/vitest-mock-hoisting.html">vi.mock ファクトリ内で外部変数を参照できない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;vitest&quot;)">vitest</span>
@@ -502,16 +502,16 @@
         </div>
         <div class="category">
             <h3>📁 OTHER</h3>
-            <div class="error-card" data-tags="devto,api,curl" data-title="&quot;Dev.to API: クエリパラメータ付きで401、なしで200&quot;" data-text="症状 原因 詳細不明。CDN（Varnish）のキャッシュが ヘッダを含むため、 クエリパラメータの有無でキャッシュキーが分かれ、パラメータ付きのパスに 認証なしのキャッシュが残っていた可能性。 解決策 クエリパラメータなしで叩く。デフォルトは30件返るので実用上は問題なし。 予防 Dev.to APIはVarnish CDN経由のため、クエリパラメータ付きで401が出たら まずパラメータなしで試す。">
-                <a href="other/devto-api-query-param-401.html">&quot;Dev.to API: クエリパラメータ付きで401、なしで200&quot;</a>
+            <div class="error-card" data-tags="devto,api,curl" data-title="Dev.to API: クエリパラメータ付きで401、なしで200" data-text="症状 原因 詳細不明。CDN（Varnish）のキャッシュが ヘッダを含むため、 クエリパラメータの有無でキャッシュキーが分かれ、パラメータ付きのパスに 認証なしのキャッシュが残っていた可能性。 解決策 クエリパラメータなしで叩く。デフォルトは30件返るので実用上は問題なし。 予防 Dev.to APIはVarnish CDN経由のため、クエリパラメータ付きで401が出たら まずパラメータなしで試す。">
+                <a href="other/devto-api-query-param-401.html">Dev.to API: クエリパラメータ付きで401、なしで200</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;devto&quot;)">devto</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;api&quot;)">api</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;curl&quot;)">curl</span>
             </div>
-            <div class="error-card" data-tags="git,lint-staged,husky,pre-commit" data-title="&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;" data-text="lint-staged: stash/pop でブランチが意図せず切り替わる 症状 ブランチでコミット後、カレントブランチが に戻っていた。 その後 が しか表示しない。 原因 lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、 異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。 解決策 影響を受けたブランチのファイルは で参照する: 根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。 予防 コミット直後は で正しいブランチにいるか確認する。">
-                <a href="other/lint-staged-stash-branch-switch.html">&quot;lint-staged の stash/pop サイクルがブランチを切り替える&quot;</a>
+            <div class="error-card" data-tags="git,lint-staged,husky,pre-commit" data-title="lint-staged の stash/pop サイクルがブランチを切り替える" data-text="lint-staged: stash/pop でブランチが意図せず切り替わる 症状 ブランチでコミット後、カレントブランチが に戻っていた。 その後 が しか表示しない。 原因 lint-staged の stash 前処理・pop 後処理がブランチ情報を失い、 異なるブランチに checkout する既知のバグ (lint-staged Issue #91 参照)。 解決策 影響を受けたブランチのファイルは で参照する: 根本修正は lint-staged のバージョンアップまたは別 hook 方式への移行。 予防 コミット直後は で正しいブランチにいるか確認する。">
+                <a href="other/lint-staged-stash-branch-switch.html">lint-staged の stash/pop サイクルがブランチを切り替える</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
@@ -519,8 +519,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;husky&quot;)">husky</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pre-commit&quot;)">pre-commit</span>
             </div>
-            <div class="error-card" data-tags="git,submodule,ci,gitignore" data-title="&quot;self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗&quot;" data-text="git: .gitmodules なしのサブモジュールで CI 全ジョブ失敗 症状 CI の全ジョブが以下で失敗。 gitleaks / actionlint / auto-fix の全ジョブが同時にコケた。 原因 auto-commit hook が （独立した git リポジトリ）を誤って し、 エントリなしのサブモジュールとして commits に記録してしまった。 解決策 その後 に を追加してコミット。 予防 独立 git リポジトリを持つディレクトリは事前に に登録する auto-commit hook がある場合は で が含まれていないか確認してから実行">
-                <a href="other/self-data-submodule-without-gitmodules.html">&quot;self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗&quot;</a>
+            <div class="error-card" data-tags="git,submodule,ci,gitignore" data-title="self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗" data-text="git: .gitmodules なしのサブモジュールで CI 全ジョブ失敗 症状 CI の全ジョブが以下で失敗。 gitleaks / actionlint / auto-fix の全ジョブが同時にコケた。 原因 auto-commit hook が （独立した git リポジトリ）を誤って し、 エントリなしのサブモジュールとして commits に記録してしまった。 解決策 その後 に を追加してコミット。 予防 独立 git リポジトリを持つディレクトリは事前に に登録する auto-commit hook がある場合は で が含まれていないか確認してから実行">
+                <a href="other/self-data-submodule-without-gitmodules.html">self-data が .gitmodules なしのサブモジュールとして記録されCI全失敗</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
@@ -531,14 +531,14 @@
         </div>
         <div class="category">
             <h3>📁 PYTHON</h3>
-            <div class="error-card" data-tags="python" data-title="&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;" data-text="DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails 現象 が、 二次インデックス付きテーブルで失敗する。 発生条件 DuckDB 1.5.4 が存在するテーブルへの 回避策 UPDATE 前にインデックスを一時削除し、UPDATE 後に再作成する。 参考 発生箇所: の 修正コミット: (feat/phase4-khr-integration)">
-                <a href="python/duckdb-art-index-update-subquery.html">&quot;DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails&quot;</a>
+            <div class="error-card" data-tags="python" data-title="DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails" data-text="DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails 現象 が、 二次インデックス付きテーブルで失敗する。 発生条件 DuckDB 1.5.4 が存在するテーブルへの 回避策 UPDATE 前にインデックスを一時削除し、UPDATE 後に再作成する。 参考 発生箇所: の 修正コミット: (feat/phase4-khr-integration)">
+                <a href="python/duckdb-art-index-update-subquery.html">DuckDB 1.5.x — ART index バグ: UPDATE with subquery fails</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
             </div>
-            <div class="error-card" data-tags="duckdb,python,lock,wal" data-title="&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;" data-text="DuckDB WAL stale lock — プロセス強制終了後に IO Error 症状 PID を確認すると存在しない（または別プロセス）なのにロックが解除されない。 原因 DuckDB を書き込み中に でプロセスを強制終了すると： 1. WAL ファイル ( ) が残る 2. DB ファイルヘッダーにロックを取った PID が記録される 3. 次回オープン時、その PID が生きているか確認し、生きていれば拒否する 4. （稀に）stale な PID が別のプロセスに再利用されていると永続的にブロックされる 解決方法 予防策 ではなく （SIGINT）でプロセスを終了する DuckDB 側に memory_limit を設定し OOM kill を避ける に を設定済み（2026-07-09 対応） 関連 knowledge.py の に / 追加">
-                <a href="python/duckdb-stale-wal-lock.html">&quot;DuckDB WAL stale lock — プロセス強制終了後に IO Error&quot;</a>
+            <div class="error-card" data-tags="duckdb,python,lock,wal" data-title="DuckDB WAL stale lock — プロセス強制終了後に IO Error" data-text="DuckDB WAL stale lock — プロセス強制終了後に IO Error 症状 PID を確認すると存在しない（または別プロセス）なのにロックが解除されない。 原因 DuckDB を書き込み中に でプロセスを強制終了すると： 1. WAL ファイル ( ) が残る 2. DB ファイルヘッダーにロックを取った PID が記録される 3. 次回オープン時、その PID が生きているか確認し、生きていれば拒否する 4. （稀に）stale な PID が別のプロセスに再利用されていると永続的にブロックされる 解決方法 予防策 ではなく （SIGINT）でプロセスを終了する DuckDB 側に memory_limit を設定し OOM kill を避ける に を設定済み（2026-07-09 対応） 関連 knowledge.py の に / 追加">
+                <a href="python/duckdb-stale-wal-lock.html">DuckDB WAL stale lock — プロセス強制終了後に IO Error</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;duckdb&quot;)">duckdb</span>
@@ -546,22 +546,22 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;lock&quot;)">lock</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wal&quot;)">wal</span>
             </div>
-            <div class="error-card" data-tags="python" data-title="&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;" data-text="jina-embeddings-v2-base-code が transformers 5.x で ImportError 症状 または 環境 (確認: 5.12.1) 原因 jina-v2 の custom code ( ) が から をインポートしているが、transformers 5.x で削除された。 また model config に が設定されているが、これも 5.x 非対応。 解決策 (768-d) に差し替える。同じ 768-d でコード意味理解に特化。 試したが効かなかった方法 → find_pruneable_heads_and_indices エラーは残る → 同上 → パッケージ不足で別エラー">
-                <a href="python/jina-v2-transformers5x-incompatible.html">&quot;jina-embeddings-v2-base-code が transformers 5.x で ImportError&quot;</a>
+            <div class="error-card" data-tags="python" data-title="jina-embeddings-v2-base-code が transformers 5.x で ImportError" data-text="jina-embeddings-v2-base-code が transformers 5.x で ImportError 症状 または 環境 (確認: 5.12.1) 原因 jina-v2 の custom code ( ) が から をインポートしているが、transformers 5.x で削除された。 また model config に が設定されているが、これも 5.x 非対応。 解決策 (768-d) に差し替える。同じ 768-d でコード意味理解に特化。 試したが効かなかった方法 → find_pruneable_heads_and_indices エラーは残る → 同上 → パッケージ不足で別エラー">
+                <a href="python/jina-v2-transformers5x-incompatible.html">jina-embeddings-v2-base-code が transformers 5.x で ImportError</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
             </div>
-            <div class="error-card" data-tags="qdrant,memory-ingest,api-key" data-title="&quot;memory-ingest ローカル Qdrant で 401 Unauthorized&quot;" data-text="症状 が を返す。 原因 内で を呼んでいた。 ローカル Qdrant（localhost:6333）も API キー認証を要求するため、キーを削除すると 401 になる。 解決策 行を削除するだけ。 に設定済みの がそのまま使われる。 予防 ローカル Qdrant を起動する際に オプションを省略しても認証なしにはならない。 Docker Compose の設定で が設定されていれば認証は必須。 を変更する際は API キーを消さないこと。">
-                <a href="python/memory-ingest-local-qdrant-401.html">&quot;memory-ingest ローカル Qdrant で 401 Unauthorized&quot;</a>
+            <div class="error-card" data-tags="qdrant,memory-ingest,api-key" data-title="memory-ingest ローカル Qdrant で 401 Unauthorized" data-text="症状 が を返す。 原因 内で を呼んでいた。 ローカル Qdrant（localhost:6333）も API キー認証を要求するため、キーを削除すると 401 になる。 解決策 行を削除するだけ。 に設定済みの がそのまま使われる。 予防 ローカル Qdrant を起動する際に オプションを省略しても認証なしにはならない。 Docker Compose の設定で が設定されていれば認証は必須。 を変更する際は API キーを消さないこと。">
+                <a href="python/memory-ingest-local-qdrant-401.html">memory-ingest ローカル Qdrant で 401 Unauthorized</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;qdrant&quot;)">qdrant</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;memory-ingest&quot;)">memory-ingest</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;api-key&quot;)">api-key</span>
             </div>
-            <div class="error-card" data-tags="python,ollama,doc-ingest,cli" data-title="&quot;Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった&quot;" data-text="Ollama HTTP 404: --model デフォルトが Anthropic モデル名 症状 実行時に Ollama から HTTP 404 が返り蒸留が失敗。 原因 の 引数のデフォルト値が になっており、Ollama に存在しないモデル名が渡されていた。 解決策 の デフォルトを に変更。 環境変数（例: ）が Ollama 側のモデル選択に使われる。 予防 Ollama と Anthropic で異なるモデル名体系であることを意識する は Anthropic フォールバック専用とし、Ollama 側は env var で制御する設計を維持">
-                <a href="python/ollama-404-wrong-default-model.html">&quot;Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった&quot;</a>
+            <div class="error-card" data-tags="python,ollama,doc-ingest,cli" data-title="Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった" data-text="Ollama HTTP 404: --model デフォルトが Anthropic モデル名 症状 実行時に Ollama から HTTP 404 が返り蒸留が失敗。 原因 の 引数のデフォルト値が になっており、Ollama に存在しないモデル名が渡されていた。 解決策 の デフォルトを に変更。 環境変数（例: ）が Ollama 側のモデル選択に使われる。 予防 Ollama と Anthropic で異なるモデル名体系であることを意識する は Anthropic フォールバック専用とし、Ollama 側は env var で制御する設計を維持">
+                <a href="python/ollama-404-wrong-default-model.html">Ollama HTTP 404: cli.py の --model デフォルトが Anthropic モデル名だった</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
@@ -569,38 +569,38 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;doc-ingest&quot;)">doc-ingest</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;cli&quot;)">cli</span>
             </div>
-            <div class="error-card" data-tags="pytest,python,fixtures" data-title="&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;" data-text="pytest: Fixture called directly エラー 症状 原因 で定義した関数を のように直接呼び出した。 pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。 解決策 テスト関数のパラメーターとして受け取る: 外部パッケージが提供する fixture ( 等) は プロジェクトの で として pytest に認識させる必要がある。 予防 fixture のテストは直接呼び出しで動作確認しようとしない パッケージ提供 fixture は必ず で re-export する">
-                <a href="python/pytest-fixture-called-directly.html">&quot;pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー&quot;</a>
+            <div class="error-card" data-tags="pytest,python,fixtures" data-title="pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー" data-text="pytest: Fixture called directly エラー 症状 原因 で定義した関数を のように直接呼び出した。 pytest は fixture をジェネレーター込みで管理するため、直接呼び出しは pytest 7.x 以降で禁止。 解決策 テスト関数のパラメーターとして受け取る: 外部パッケージが提供する fixture ( 等) は プロジェクトの で として pytest に認識させる必要がある。 予防 fixture のテストは直接呼び出しで動作確認しようとしない パッケージ提供 fixture は必ず で re-export する">
+                <a href="python/pytest-fixture-called-directly.html">pytest fixture を直接呼び出すと &#x27;Fixture called directly&#x27; エラー</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pytest&quot;)">pytest</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;fixtures&quot;)">fixtures</span>
             </div>
-            <div class="error-card" data-tags="pytest,worktree,conftest" data-title="&quot;pytest の path 部分文字列判定が worktree 名に誤マッチして全テスト skip&quot;" data-text="症状 で integration テストだけを skip するつもりが、 unit テストを含む **全 32 テストが skip*された。 原因 判定が という部分文字列マッチだったため、 git worktree のパス に含まれる &quot;integration&quot; に全テストファイルがマッチした。 解決策 conftest.py 自身のディレクトリを基準にした前方一致に変更: 予防 テストの選別はパスの部分文字列でなく 基準か marker ベース（ ）で行う worktree 分離運用ではディレクトリ名が任意の文字列を含む前提でコードを書く">
-                <a href="python/pytest-skip-path-substring-worktree.html">&quot;pytest の path 部分文字列判定が worktree 名に誤マッチして全テスト skip&quot;</a>
+            <div class="error-card" data-tags="pytest,worktree,conftest" data-title="pytest の path 部分文字列判定が worktree 名に誤マッチして全テスト skip" data-text="症状 で integration テストだけを skip するつもりが、 unit テストを含む **全 32 テストが skip*された。 原因 判定が という部分文字列マッチだったため、 git worktree のパス に含まれる &quot;integration&quot; に全テストファイルがマッチした。 解決策 conftest.py 自身のディレクトリを基準にした前方一致に変更: 予防 テストの選別はパスの部分文字列でなく 基準か marker ベース（ ）で行う worktree 分離運用ではディレクトリ名が任意の文字列を含む前提でコードを書く">
+                <a href="python/pytest-skip-path-substring-worktree.html">pytest の path 部分文字列判定が worktree 名に誤マッチして全テスト skip</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pytest&quot;)">pytest</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;worktree&quot;)">worktree</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;conftest&quot;)">conftest</span>
             </div>
-            <div class="error-card" data-tags="python" data-title="&quot;Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する&quot;" data-text="Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する 症状 原因 モデルの tokenizer config が HuggingFace transformers の で認識できないクラスを持っている。 transformers バージョンと ruri-base の tokenizer_config.json の が 不一致の可能性。 影響範囲 の全 ingest コマンドが失敗する（sessions / facts とも）。 未解決・次回確認事項 transformers バージョン確認 ruri-base の tokenizer_config.json を確認し の値を調べる の別モデル（all-mpnet-base-v2）への切り替えを検討">
-                <a href="python/qdrant-ruri-base-tokenizer.html">&quot;Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する&quot;</a>
+            <div class="error-card" data-tags="python" data-title="Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する" data-text="Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する 症状 原因 モデルの tokenizer config が HuggingFace transformers の で認識できないクラスを持っている。 transformers バージョンと ruri-base の tokenizer_config.json の が 不一致の可能性。 影響範囲 の全 ingest コマンドが失敗する（sessions / facts とも）。 未解決・次回確認事項 transformers バージョン確認 ruri-base の tokenizer_config.json を確認し の値を調べる の別モデル（all-mpnet-base-v2）への切り替えを検討">
+                <a href="python/qdrant-ruri-base-tokenizer.html">Qdrant memory-ingest が ruri-base tokenizer エラーで失敗する</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
             </div>
-            <div class="error-card" data-tags="python,subprocess,memory" data-title="&quot;subprocess.run(stdout=PIPE) で大量出力をメモリバッファして肥大化&quot;" data-text="症状 Rust クローラーの出力を Python で受け取る処理で、 を使ったところ クローラー終了まで全 JSONL 出力がメモリに蓄積し、1.6GB → 3GB 超まで膨れた。 DuckDB への書き込みもその後まとめて行うため、ピーク時は DB 処理とバッファが共存した。 原因 はプロセス終了まで全 stdout をバッファに保持する。 クローラーが 19 ページ分の JSONL を出力し終わるまで、その全データが Python プロセスメモリに乗り続ける。 解決策 + イテレーションで1行ずつストリーム処理： DB 接続を1つ共有して行ごとに使い回す（ を渡す）ことで、接続オーバーヘッドも削減。 予防 外部プロセスの出力量が事前に分からない場合は + イテレーション はログ収集など「小さい出力が確実」な用途に限定する 1 ページあたりのテキスト上限（ ）を設けてサイズ爆発を防ぐ">
-                <a href="python/subprocess-run-pipe-memory-buffer.html">&quot;subprocess.run(stdout=PIPE) で大量出力をメモリバッファして肥大化&quot;</a>
+            <div class="error-card" data-tags="python,subprocess,memory" data-title="subprocess.run(stdout=PIPE) で大量出力をメモリバッファして肥大化" data-text="症状 Rust クローラーの出力を Python で受け取る処理で、 を使ったところ クローラー終了まで全 JSONL 出力がメモリに蓄積し、1.6GB → 3GB 超まで膨れた。 DuckDB への書き込みもその後まとめて行うため、ピーク時は DB 処理とバッファが共存した。 原因 はプロセス終了まで全 stdout をバッファに保持する。 クローラーが 19 ページ分の JSONL を出力し終わるまで、その全データが Python プロセスメモリに乗り続ける。 解決策 + イテレーションで1行ずつストリーム処理： DB 接続を1つ共有して行ごとに使い回す（ を渡す）ことで、接続オーバーヘッドも削減。 予防 外部プロセスの出力量が事前に分からない場合は + イテレーション はログ収集など「小さい出力が確実」な用途に限定する 1 ページあたりのテキスト上限（ ）を設けてサイズ爆発を防ぐ">
+                <a href="python/subprocess-run-pipe-memory-buffer.html">subprocess.run(stdout=PIPE) で大量出力をメモリバッファして肥大化</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;subprocess&quot;)">subprocess</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;memory&quot;)">memory</span>
             </div>
-            <div class="error-card" data-tags="python" data-title="&quot;Zenn API フィールド名の罠&quot;" data-text="Zenn API フィールド名の罠 症状 記事一覧エンドポイント ( ) の を と誤って参照し、常に 0 になった フィールドが記事一覧には含まれず、個別エンドポイント ( ) にのみ存在する 正しい仕様 対策 topics・本文が必要な場合は フラグで個別 API を叩く upsert 時に を使用する">
-                <a href="python/zenn-api-field-mismatch.html">&quot;Zenn API フィールド名の罠&quot;</a>
+            <div class="error-card" data-tags="python" data-title="Zenn API フィールド名の罠" data-text="Zenn API フィールド名の罠 症状 記事一覧エンドポイント ( ) の を と誤って参照し、常に 0 になった フィールドが記事一覧には含まれず、個別エンドポイント ( ) にのみ存在する 正しい仕様 対策 topics・本文が必要な場合は フラグで個別 API を叩く upsert 時に を使用する">
+                <a href="python/zenn-api-field-mismatch.html">Zenn API フィールド名の罠</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
@@ -608,8 +608,8 @@
         </div>
         <div class="category">
             <h3>📁 RUNTIME</h3>
-            <div class="error-card" data-tags="runtime" data-title="&quot;qdrant-client 1.18 で client.search() が廃止&quot;" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC 192.168.68.63:6333)">
-                <a href="runtime/qdrant-client-search-removed.html">&quot;qdrant-client 1.18 で client.search() が廃止&quot;</a>
+            <div class="error-card" data-tags="runtime" data-title="qdrant-client 1.18 で client.search() が廃止" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC 192.168.68.63:6333)">
+                <a href="runtime/qdrant-client-search-removed.html">qdrant-client 1.18 で client.search() が廃止</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;runtime&quot;)">runtime</span>
@@ -617,8 +617,8 @@
         </div>
         <div class="category">
             <h3>📁 RUST</h3>
-            <div class="error-card" data-tags="rust,tokio,async,memory" data-title="&quot;tokio::spawn で全タスクを事前生成するとメモリ爆発&quot;" data-text="症状 Rust の非同期クローラーで 49 URL を処理しようとしたら、11.5GB + CPU 100% で爆走し OOM 終了。 でセマフォ付き並列実行を実装していた。 原因 問題点が2つ： 1. で49タスクを即座に全生成 → メモリに全タスク乗る 2. が **先頭から順番**に await するため、後続タスクの完了結果（HTML・DOM）が先頭タスクの完了を待ちながら全部メモリに滞留 3. HTML パース（ crate）が CPU バウンド処理を async スレッドでブロック → CPU 飽和 解決策 で同時タスク数を制限し、完了した順に処理： 加えて： で CPU バウンドの HTML パースをブロッキングスレッドへ移動 にレスポンスサイズ上限（5MB）を追加 予防 + セマフォの組み合わせは「並列数制限」に見えるが、全タスクを spawn した時点でメモリを確保してしまう 並列数制限は が正解。 や は HTTP リクエスト数制限には使えるが、メモリ使用量制限には不十分 CPU バウンド処理（HTML パース、圧縮、暗号化）は を使う">
-                <a href="rust/tokio-spawn-all-tasks-memory-explosion.html">&quot;tokio::spawn で全タスクを事前生成するとメモリ爆発&quot;</a>
+            <div class="error-card" data-tags="rust,tokio,async,memory" data-title="tokio::spawn で全タスクを事前生成するとメモリ爆発" data-text="症状 Rust の非同期クローラーで 49 URL を処理しようとしたら、11.5GB + CPU 100% で爆走し OOM 終了。 でセマフォ付き並列実行を実装していた。 原因 問題点が2つ： 1. で49タスクを即座に全生成 → メモリに全タスク乗る 2. が **先頭から順番**に await するため、後続タスクの完了結果（HTML・DOM）が先頭タスクの完了を待ちながら全部メモリに滞留 3. HTML パース（ crate）が CPU バウンド処理を async スレッドでブロック → CPU 飽和 解決策 で同時タスク数を制限し、完了した順に処理： 加えて： で CPU バウンドの HTML パースをブロッキングスレッドへ移動 にレスポンスサイズ上限（5MB）を追加 予防 + セマフォの組み合わせは「並列数制限」に見えるが、全タスクを spawn した時点でメモリを確保してしまう 並列数制限は が正解。 や は HTTP リクエスト数制限には使えるが、メモリ使用量制限には不十分 CPU バウンド処理（HTML パース、圧縮、暗号化）は を使う">
+                <a href="rust/tokio-spawn-all-tasks-memory-explosion.html">tokio::spawn で全タスクを事前生成するとメモリ爆発</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;rust&quot;)">rust</span>
@@ -629,8 +629,8 @@
         </div>
         <div class="category">
             <h3>📁 SYSTEM</h3>
-            <div class="error-card" data-tags="github,arc,runners,auth" data-title="&quot;GitHub App org-level runners API が 404 (user account の場合)&quot;" data-text="症状 ARC (Actions Runner Controller) に GitHub App 認証で flipslidersand の runners を register しようとしたが、以下のエラー: 原因 GitHub Actions runners API は **org-level*と **repo-level*の 2 つが存在: org-level: — organization アカウント専用 repo-level: — user or org 両対応 **flipslidersand は user account であり、org ではない*ため、org-level API は 404 を返す。 GitHub App を使用してもこの制限は変わらない（スコープ問題ではなく API 設計）。 解決策 GitHub App → **repo-level PAT (Personal Access Token)*に切り替え: ARC が repo-level registration token を自動取得してランナー登録を完了。 予防 **user account*で Act">
-                <a href="system/github-app-org-level-runners-404.html">&quot;GitHub App org-level runners API が 404 (user account の場合)&quot;</a>
+            <div class="error-card" data-tags="github,arc,runners,auth" data-title="GitHub App org-level runners API が 404 (user account の場合)" data-text="症状 ARC (Actions Runner Controller) に GitHub App 認証で flipslidersand の runners を register しようとしたが、以下のエラー: 原因 GitHub Actions runners API は **org-level*と **repo-level*の 2 つが存在: org-level: — organization アカウント専用 repo-level: — user or org 両対応 **flipslidersand は user account であり、org ではない*ため、org-level API は 404 を返す。 GitHub App を使用してもこの制限は変わらない（スコープ問題ではなく API 設計）。 解決策 GitHub App → **repo-level PAT (Personal Access Token)*に切り替え: ARC が repo-level registration token を自動取得してランナー登録を完了。 予防 **user account*で Act">
+                <a href="system/github-app-org-level-runners-404.html">GitHub App org-level runners API が 404 (user account の場合)</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
@@ -638,8 +638,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;runners&quot;)">runners</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;auth&quot;)">auth</span>
             </div>
-            <div class="error-card" data-tags="github,arc,authentication,kubernetes" data-title="&quot;ARC controller で GitHub PAT 認証エラー 401 Bad credentials&quot;" data-text="症状 DS1 WSL2 上の summerwind ARC controller が runner pod を起動しようとした際、GitHub API 呼び出しで以下のエラー: RunnerDeployment は created だが、pod は未起動。ログで繰り返し認証エラーが出ている。 原因 GitHub PAT が無効: 1. YUKI k3s から base64 デコード → DS1 secret として設定 2. ARC controller が secret から github_token を読み込んで API 呼び出し 3. トークンが無効（期限切れ/権限不足/破損）→ 401 デコード時の問題の可能性: Base64 二重化 ホスト間でのエンコード差異 Token 内の特殊文字処理 解決策 **1. 新規 GitHub PAT を生成***2. Secret を更新***3. ARC pod を再起動して secret 再読み込み***4. Runner pod 起動を確認*予防 1. **PAT の直接生成**: 別ホストから複製しない 2. **Scope 確認*">
-                <a href="system/github-arc-pat-authentication-401.html">&quot;ARC controller で GitHub PAT 認証エラー 401 Bad credentials&quot;</a>
+            <div class="error-card" data-tags="github,arc,authentication,kubernetes" data-title="ARC controller で GitHub PAT 認証エラー 401 Bad credentials" data-text="症状 DS1 WSL2 上の summerwind ARC controller が runner pod を起動しようとした際、GitHub API 呼び出しで以下のエラー: RunnerDeployment は created だが、pod は未起動。ログで繰り返し認証エラーが出ている。 原因 GitHub PAT が無効: 1. YUKI k3s から base64 デコード → DS1 secret として設定 2. ARC controller が secret から github_token を読み込んで API 呼び出し 3. トークンが無効（期限切れ/権限不足/破損）→ 401 デコード時の問題の可能性: Base64 二重化 ホスト間でのエンコード差異 Token 内の特殊文字処理 解決策 **1. 新規 GitHub PAT を生成***2. Secret を更新***3. ARC pod を再起動して secret 再読み込み***4. Runner pod 起動を確認*予防 1. **PAT の直接生成**: 別ホストから複製しない 2. **Scope 確認*">
+                <a href="system/github-arc-pat-authentication-401.html">ARC controller で GitHub PAT 認証エラー 401 Bad credentials</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
@@ -647,8 +647,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;authentication&quot;)">authentication</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;kubernetes&quot;)">kubernetes</span>
             </div>
-            <div class="error-card" data-tags="gopass,minipc,secrets,ssh" data-title="&quot;MINIPC の gopass は dev 機と別ストア — SSH 先で gopass ls が空になる&quot;" data-text="症状 dev 機で すると infra/discord/\等が見えるが、 は何も返らない（空出力）。 原因 gopass は をユーザーごとに管理する。 MINIPC の yuki ユーザーは独立した gopass ストアを持っており、 dev 機のエントリとは別管理になっている。 MINIPC 側には 等の一部エントリのみ登録されている。 解決策 MINIPC に新しいシークレットを登録する場合は で直接挿入する。 または dev 機の gopass エントリを / で共有する（GPG キーが必要）。 予防 ssh 先で gopass を使うスクリプトを書く前に、 で存在確認を先行する。">
-                <a href="system/minipc-gopass-separate-store.html">&quot;MINIPC の gopass は dev 機と別ストア — SSH 先で gopass ls が空になる&quot;</a>
+            <div class="error-card" data-tags="gopass,minipc,secrets,ssh" data-title="MINIPC の gopass は dev 機と別ストア — SSH 先で gopass ls が空になる" data-text="症状 dev 機で すると infra/discord/\等が見えるが、 は何も返らない（空出力）。 原因 gopass は をユーザーごとに管理する。 MINIPC の yuki ユーザーは独立した gopass ストアを持っており、 dev 機のエントリとは別管理になっている。 MINIPC 側には 等の一部エントリのみ登録されている。 解決策 MINIPC に新しいシークレットを登録する場合は で直接挿入する。 または dev 機の gopass エントリを / で共有する（GPG キーが必要）。 予防 ssh 先で gopass を使うスクリプトを書く前に、 で存在確認を先行する。">
+                <a href="system/minipc-gopass-separate-store.html">MINIPC の gopass は dev 機と別ストア — SSH 先で gopass ls が空になる</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;gopass&quot;)">gopass</span>
@@ -656,8 +656,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;secrets&quot;)">secrets</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ssh&quot;)">ssh</span>
             </div>
-            <div class="error-card" data-tags="wsl2,docker,windows,firewall,networking" data-title="&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;" data-text="症状 WSL2 内で Docker コンテナを起動し でバインドしても、外部（同一 LAN の別ホスト）から接続タイムアウトになる。 では WSL2 側は LISTEN しているが LAN からは到達できない。 原因 WSL2 は mirrored networking モードでも Windows Firewall のインバウンドルールが未定義のポートへの接続をブロックする。 Linux 側の / iptables ではなく Windows 側の Firewall が関係する。 解決策 Windows 側で inbound ルールを追加する（SSH 経由で実行可）： 複数ポートの場合： 予防 WSL2 で新しいポートを公開する際は、必ず Windows Firewall inbound ルールを追加する。 だけでは外部接続は開かない。">
-                <a href="system/windows-firewall-blocks-docker-ports.html">&quot;Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）&quot;</a>
+            <div class="error-card" data-tags="wsl2,docker,windows,firewall,networking" data-title="Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）" data-text="症状 WSL2 内で Docker コンテナを起動し でバインドしても、外部（同一 LAN の別ホスト）から接続タイムアウトになる。 では WSL2 側は LISTEN しているが LAN からは到達できない。 原因 WSL2 は mirrored networking モードでも Windows Firewall のインバウンドルールが未定義のポートへの接続をブロックする。 Linux 側の / iptables ではなく Windows 側の Firewall が関係する。 解決策 Windows 側で inbound ルールを追加する（SSH 経由で実行可）： 複数ポートの場合： 予防 WSL2 で新しいポートを公開する際は、必ず Windows Firewall inbound ルールを追加する。 だけでは外部接続は開かない。">
+                <a href="system/windows-firewall-blocks-docker-ports.html">Windows Firewall が WSL2 Docker ポートをブロック（外部接続不可）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -666,8 +666,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;firewall&quot;)">firewall</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;networking&quot;)">networking</span>
             </div>
-            <div class="error-card" data-tags="wsl2,networking,portproxy,node_exporter" data-title="&quot;WSL2 mirrored networking で portproxy を使うと connection reset になる&quot;" data-text="症状 WSL2 mirrored networking ( ) 環境で を 設定すると、以下の問題が発生する。 1. **&quot;address already in use&quot;**: portproxy が LAN IP:9100 でリッスンしており、 WSL2 内の node_exporter が同じポートをバインドできない（mirrored networking により Windows と WSL2 は同一 IP を共有するため） 2. **&quot;connection reset&quot;**: portproxy が TCP 接続を受け入れるが、 WSL2 へのデータ転送で接続が切断される（原因不明だが再現性あり） 3. **&quot;empty reply&quot;**: で portproxy を設定すると 127.0.0.1:PORT 自身にループバックして空レスポンスになる 原因 WSL2 mirrored networking は Windows と WSL2 が同一 LAN IP を共有する。 この状態で portproxy を追加しても冗長どころか干渉する。 portproxy は NAT モード用">
-                <a href="system/wsl2-mirrored-networking-portproxy-conflict.html">&quot;WSL2 mirrored networking で portproxy を使うと connection reset になる&quot;</a>
+            <div class="error-card" data-tags="wsl2,networking,portproxy,node_exporter" data-title="WSL2 mirrored networking で portproxy を使うと connection reset になる" data-text="症状 WSL2 mirrored networking ( ) 環境で を 設定すると、以下の問題が発生する。 1. **&quot;address already in use&quot;**: portproxy が LAN IP:9100 でリッスンしており、 WSL2 内の node_exporter が同じポートをバインドできない（mirrored networking により Windows と WSL2 は同一 IP を共有するため） 2. **&quot;connection reset&quot;**: portproxy が TCP 接続を受け入れるが、 WSL2 へのデータ転送で接続が切断される（原因不明だが再現性あり） 3. **&quot;empty reply&quot;**: で portproxy を設定すると 127.0.0.1:PORT 自身にループバックして空レスポンスになる 原因 WSL2 mirrored networking は Windows と WSL2 が同一 LAN IP を共有する。 この状態で portproxy を追加しても冗長どころか干渉する。 portproxy は NAT モード用">
+                <a href="system/wsl2-mirrored-networking-portproxy-conflict.html">WSL2 mirrored networking で portproxy を使うと connection reset になる</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -675,8 +675,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;portproxy&quot;)">portproxy</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;node_exporter&quot;)">node_exporter</span>
             </div>
-            <div class="error-card" data-tags="wsl2,portproxy,ollama,windows,mirrored-networking" data-title="&quot;WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可&quot;" data-text="症状 DS1 で Ollama が WSL2 内で &quot;address already in use&quot; で起動失敗。 LAN から 192.168.68.60:11434 に TCP は繋がるが HTTP はコネクションリセット。 原因 を設定すると、 mirrored networking モードでは Windows の svchost(iphlpsvc) が先に を確保する。 WSL2 から見た 127.0.0.1:11434 も同じ network namespace のため、Ollama が bind できない。 解決策 **mirrored networking で Ollama が直接 0.0.0.0:11434 をリッスンするサービスには portproxy を設定しない。*その後 Ollama を再起動すれば LAN から直接アクセス可能になる。 予防 から port 11434 を除外済み。 mirrored networking 環境では WSL2 サービスが で bind するポートには portproxy 不要。 portproxy が必要なのは NAT モード時">
-                <a href="system/wsl2-mirrored-portproxy-port-conflict.html">&quot;WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可&quot;</a>
+            <div class="error-card" data-tags="wsl2,portproxy,ollama,windows,mirrored-networking" data-title="WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可" data-text="症状 DS1 で Ollama が WSL2 内で &quot;address already in use&quot; で起動失敗。 LAN から 192.168.68.60:11434 に TCP は繋がるが HTTP はコネクションリセット。 原因 を設定すると、 mirrored networking モードでは Windows の svchost(iphlpsvc) が先に を確保する。 WSL2 から見た 127.0.0.1:11434 も同じ network namespace のため、Ollama が bind できない。 解決策 **mirrored networking で Ollama が直接 0.0.0.0:11434 をリッスンするサービスには portproxy を設定しない。*その後 Ollama を再起動すれば LAN から直接アクセス可能になる。 予防 から port 11434 を除外済み。 mirrored networking 環境では WSL2 サービスが で bind するポートには portproxy 不要。 portproxy が必要なのは NAT モード時">
+                <a href="system/wsl2-mirrored-portproxy-port-conflict.html">WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -685,8 +685,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;windows&quot;)">windows</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;mirrored-networking&quot;)">mirrored-networking</span>
             </div>
-            <div class="error-card" data-tags="wsl2,k3s,networking,iptables,pod" data-title="&quot;WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）&quot;" data-text="症状 YUKI WSL2 k3s の pod から への TCP 通信がタイムアウト: 一方、ICMP ping は成功: 原因 WSL2 **mirrored networking mode*では、pod outbound パケットが iptables **MASQUERADE*に失敗: **mirrored mode**: pod が Windows ホストの IP を共有（192.168.68.56） iptables MASQUERADE で送信元を変換しようとしても、WSL2 kernel の制限で TCP ACK が戻らない ICMP は kernel 処理で通るが、TCP は application layer なため詰まる kubeadm・k3s 両方とも同じ制限。 解決策 **NAT networking mode に切り替え**: を以下に変更（Windows 側）: WSL2 を再起動: 新しい IP で pod 起動（172.31.x.x 帯）。pod から TCP 443 が通るようになる。 kubectl アクセスの復旧 WSL2 IP が変わるため、**p">
-                <a href="system/wsl2-pod-tcp-blocked-mirrored-networking.html">&quot;WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）&quot;</a>
+            <div class="error-card" data-tags="wsl2,k3s,networking,iptables,pod" data-title="WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）" data-text="症状 YUKI WSL2 k3s の pod から への TCP 通信がタイムアウト: 一方、ICMP ping は成功: 原因 WSL2 **mirrored networking mode*では、pod outbound パケットが iptables **MASQUERADE*に失敗: **mirrored mode**: pod が Windows ホストの IP を共有（192.168.68.56） iptables MASQUERADE で送信元を変換しようとしても、WSL2 kernel の制限で TCP ACK が戻らない ICMP は kernel 処理で通るが、TCP は application layer なため詰まる kubeadm・k3s 両方とも同じ制限。 解決策 **NAT networking mode に切り替え**: を以下に変更（Windows 側）: WSL2 を再起動: 新しい IP で pod 起動（172.31.x.x 帯）。pod から TCP 443 が通るようになる。 kubectl アクセスの復旧 WSL2 IP が変わるため、**p">
+                <a href="system/wsl2-pod-tcp-blocked-mirrored-networking.html">WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -695,8 +695,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;iptables&quot;)">iptables</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pod&quot;)">pod</span>
             </div>
-            <div class="error-card" data-tags="wsl2,ssh,docker,bash" data-title="&quot;WSL2 SSH 経由の bash -c 複雑引数が exit 1 で失敗&quot;" data-text="症状 複雑な引数（ダブルクォート + 変数展開の混在）を含む場合、SSH + WSL2 経由で を実行すると exit code 1 で失敗する。エラーメッセージなし。 原因 SSH → Windows → WSL2 のシェル多段エスケープで引数が壊れる。 の内側クォートが剥がれて に渡る文字列が解釈不能になる。 解決策 スクリプトをファイルとして書き込んでから実行する。 予防 WSL2 SSH 経由では、複数のクォートが必要な場合は を避けてスクリプトファイル経由にする。">
-                <a href="system/wsl2-ssh-complex-bash-args.html">&quot;WSL2 SSH 経由の bash -c 複雑引数が exit 1 で失敗&quot;</a>
+            <div class="error-card" data-tags="wsl2,ssh,docker,bash" data-title="WSL2 SSH 経由の bash -c 複雑引数が exit 1 で失敗" data-text="症状 複雑な引数（ダブルクォート + 変数展開の混在）を含む場合、SSH + WSL2 経由で を実行すると exit code 1 で失敗する。エラーメッセージなし。 原因 SSH → Windows → WSL2 のシェル多段エスケープで引数が壊れる。 の内側クォートが剥がれて に渡る文字列が解釈不能になる。 解決策 スクリプトをファイルとして書き込んでから実行する。 予防 WSL2 SSH 経由では、複数のクォートが必要な場合は を避けてスクリプトファイル経由にする。">
+                <a href="system/wsl2-ssh-complex-bash-args.html">WSL2 SSH 経由の bash -c 複雑引数が exit 1 で失敗</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -704,8 +704,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;docker&quot;)">docker</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;bash&quot;)">bash</span>
             </div>
-            <div class="error-card" data-tags="wsl2,ssh,path,windows" data-title="&quot;WSL2 SSH セッションで PATH が空になり sudo/docker 等が見つからない&quot;" data-text="症状 Windows OpenSSH 経由で WSL2 に接続し を実行すると以下が出る。 原因 の形式では や が読まれず、PATH が初期化されない。 解決策 コマンド冒頭で PATH を明示する。 またはログインシェルで実行: 予防 WSL2 へのリモートコマンドは (login shell) を使うか、スクリプト先頭に を入れる。">
-                <a href="system/wsl2-ssh-path-empty.html">&quot;WSL2 SSH セッションで PATH が空になり sudo/docker 等が見つからない&quot;</a>
+            <div class="error-card" data-tags="wsl2,ssh,path,windows" data-title="WSL2 SSH セッションで PATH が空になり sudo/docker 等が見つからない" data-text="症状 Windows OpenSSH 経由で WSL2 に接続し を実行すると以下が出る。 原因 の形式では や が読まれず、PATH が初期化されない。 解決策 コマンド冒頭で PATH を明示する。 またはログインシェルで実行: 予防 WSL2 へのリモートコマンドは (login shell) を使うか、スクリプト先頭に を入れる。">
+                <a href="system/wsl2-ssh-path-empty.html">WSL2 SSH セッションで PATH が空になり sudo/docker 等が見つからない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -716,36 +716,36 @@
         </div>
         <div class="category">
             <h3>📁 TOOLING</h3>
-            <div class="error-card" data-tags="tooling" data-title="&quot;actionlint: YAML config の `ignore` キーは未サポート&quot;" data-text="actionlint: YAML config の キーは未サポート 症状 に を追加しても actionlint がエラーを抑制しない。 環境 actionlint v1.7.12（Docker: rhysd/actionlint:latest） で キーを使用 原因 は actionlint の YAML config file では**サポートされていない**キー。 CLI フラグ としてのみ有効。 関連: ファイル先頭の shellcheck disable も機能しない actionlint は shellcheck 実行時にシェバン行（ ）を注入する。 そのため ブロック先頭の は 「ファイル全体への適用」ではなく「次の1行のみ」の disable として機能してしまう。 解決策 問題行の**直前**に per-line disable コメントを追加する。 SC2016 の実際の誤検知原因 マークダウン用バッククォートが単引用符内にある場合、 shellcheck がコマンド置換（` cmd `）と誤判定して SC2016 を発生させる。 参照 PR #374 (fix)">
-                <a href="tooling/actionlint-ignore-yaml-unsupported.html">&quot;actionlint: YAML config の `ignore` キーは未サポート&quot;</a>
+            <div class="error-card" data-tags="tooling" data-title="actionlint: YAML config の `ignore` キーは未サポート" data-text="actionlint: YAML config の キーは未サポート 症状 に を追加しても actionlint がエラーを抑制しない。 環境 actionlint v1.7.12（Docker: rhysd/actionlint:latest） で キーを使用 原因 は actionlint の YAML config file では**サポートされていない**キー。 CLI フラグ としてのみ有効。 関連: ファイル先頭の shellcheck disable も機能しない actionlint は shellcheck 実行時にシェバン行（ ）を注入する。 そのため ブロック先頭の は 「ファイル全体への適用」ではなく「次の1行のみ」の disable として機能してしまう。 解決策 問題行の**直前**に per-line disable コメントを追加する。 SC2016 の実際の誤検知原因 マークダウン用バッククォートが単引用符内にある場合、 shellcheck がコマンド置換（` cmd `）と誤判定して SC2016 を発生させる。 参照 PR #374 (fix)">
+                <a href="tooling/actionlint-ignore-yaml-unsupported.html">actionlint: YAML config の `ignore` キーは未サポート</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;tooling&quot;)">tooling</span>
             </div>
-            <div class="error-card" data-tags="git,bash-tool,claude-code" data-title="&quot;bash tool で git checkout -b 後に別ブランチへ誤コミット&quot;" data-text="症状 新しいブランチ に切り替わったはずが、 実際には にコミットされる。 原因 Claude Code の Bash ツールはコール間で working directory を持続するが、 フラグは git コマンドのみに適用される（シェルの cd とは異なる）。 次のコールでは git repository の HEAD が元のブランチのまま残るケースがある。 特に 等のコマンドを同一 Bash コールに続けると、 pnpm が workspace root に移動することで git の参照先が変わる可能性がある。 解決策 誤コミット発覚後の修復手順: 予防 の直後に で確認する ブランチ切り替えと pnpm/npm コマンドは別 Bash コールで実行する コミット前に必ず を確認する">
-                <a href="tooling/bash-tool-wrong-branch-commit.html">&quot;bash tool で git checkout -b 後に別ブランチへ誤コミット&quot;</a>
+            <div class="error-card" data-tags="git,bash-tool,claude-code" data-title="bash tool で git checkout -b 後に別ブランチへ誤コミット" data-text="症状 新しいブランチ に切り替わったはずが、 実際には にコミットされる。 原因 Claude Code の Bash ツールはコール間で working directory を持続するが、 フラグは git コマンドのみに適用される（シェルの cd とは異なる）。 次のコールでは git repository の HEAD が元のブランチのまま残るケースがある。 特に 等のコマンドを同一 Bash コールに続けると、 pnpm が workspace root に移動することで git の参照先が変わる可能性がある。 解決策 誤コミット発覚後の修復手順: 予防 の直後に で確認する ブランチ切り替えと pnpm/npm コマンドは別 Bash コールで実行する コミット前に必ず を確認する">
+                <a href="tooling/bash-tool-wrong-branch-commit.html">bash tool で git checkout -b 後に別ブランチへ誤コミット</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;bash-tool&quot;)">bash-tool</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;claude-code&quot;)">claude-code</span>
             </div>
-            <div class="error-card" data-tags="github-actions,stacked-pr,ci" data-title="&quot;CI workflow が main 未マージ → stacked PR で CI がトリガーされない&quot;" data-text="症状 PR#1（CI workflow 追加）→ PR#2（README）→ PR#3（テスト）のように stacked PR を作ると、 PR#2/#3 では CI チェックが一切実行されず &quot;no checks&quot; になる。 PR#1 の CI も fmt/clippy エラーが残ったまま failing になる。 原因 GitHub Actions は が **default branch（main）*に存在する場合のみ pull_request イベントでトリガーされる。 stacked PR#1 がマージされて初めて CI workflow が main に入る → それまで PR#2/#3 は CI 無し。 解決策 **全変更を1ブランチに集約して1つの PR にする。*squash merge 後に旧 PR（#1/#2/#3）を individually close する。 予防 CI workflow 自体を新規追加する際は必ずその branch に全変更を含めるか、 main に CI を先行マージしてから機能ブランチを作る。 stacked PR + CI 同時追加の">
-                <a href="tooling/ci-workflow-stacked-pr-chicken-egg.html">&quot;CI workflow が main 未マージ → stacked PR で CI がトリガーされない&quot;</a>
+            <div class="error-card" data-tags="github-actions,stacked-pr,ci" data-title="CI workflow が main 未マージ → stacked PR で CI がトリガーされない" data-text="症状 PR#1（CI workflow 追加）→ PR#2（README）→ PR#3（テスト）のように stacked PR を作ると、 PR#2/#3 では CI チェックが一切実行されず &quot;no checks&quot; になる。 PR#1 の CI も fmt/clippy エラーが残ったまま failing になる。 原因 GitHub Actions は が **default branch（main）*に存在する場合のみ pull_request イベントでトリガーされる。 stacked PR#1 がマージされて初めて CI workflow が main に入る → それまで PR#2/#3 は CI 無し。 解決策 **全変更を1ブランチに集約して1つの PR にする。*squash merge 後に旧 PR（#1/#2/#3）を individually close する。 予防 CI workflow 自体を新規追加する際は必ずその branch に全変更を含めるか、 main に CI を先行マージしてから機能ブランチを作る。 stacked PR + CI 同時追加の">
+                <a href="tooling/ci-workflow-stacked-pr-chicken-egg.html">CI workflow が main 未マージ → stacked PR で CI がトリガーされない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-actions&quot;)">github-actions</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;stacked-pr&quot;)">stacked-pr</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
             </div>
-            <div class="error-card" data-tags="tooling" data-title="&quot;Claude Code 無応答 — UserPromptSubmit フック参照切れ&quot;" data-text="Claude Code 無応答 — UserPromptSubmit フック参照切れ 症状 新規セッションで入力しても読み込み後にサイレント（応答返らない）。 原因 フックが2箇所に登録されており、片方のスクリプトパスが古いままだった。 はリファクタで にリネームされたが、ユーザー設定側の参照が更新されていなかった。 修正 確認方法 → 存在しないパスを参照しているエントリがないこと 教訓 フック用スクリプトをリネームしたら と の両方を更新する 無応答・遅延の第一チェックポイントは フックのスクリプトパス">
-                <a href="tooling/claude-code-silent-userpromptsubmit-hook.html">&quot;Claude Code 無応答 — UserPromptSubmit フック参照切れ&quot;</a>
+            <div class="error-card" data-tags="tooling" data-title="Claude Code 無応答 — UserPromptSubmit フック参照切れ" data-text="Claude Code 無応答 — UserPromptSubmit フック参照切れ 症状 新規セッションで入力しても読み込み後にサイレント（応答返らない）。 原因 フックが2箇所に登録されており、片方のスクリプトパスが古いままだった。 はリファクタで にリネームされたが、ユーザー設定側の参照が更新されていなかった。 修正 確認方法 → 存在しないパスを参照しているエントリがないこと 教訓 フック用スクリプトをリネームしたら と の両方を更新する 無応答・遅延の第一チェックポイントは フックのスクリプトパス">
+                <a href="tooling/claude-code-silent-userpromptsubmit-hook.html">Claude Code 無応答 — UserPromptSubmit フック参照切れ</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;tooling&quot;)">tooling</span>
             </div>
-            <div class="error-card" data-tags="git,credential,gh-cli,multi-account,github" data-title="&quot;gh auth git-credential が ~/.git-credentials より優先され別 org への push が 403&quot;" data-text="症状 が以下で失敗する: に が存在するのに、 として認証されてしまう。 原因 が に以下を書き込む: この設定が より優先され、gh のアクティブアカウント （この場合 ）で認証される。 で override しても が残るため効かない。 解決策 push URL に直接 PAT を埋め込んでクレデンシャルヘルパーをバイパス: 予防 複数 GitHub アカウントを扱うリポジトリでは、remote URL に username を含める: または でアクティブアカウントを切り替えてから push PAT は gopass に登録しておくと取り出しやすい">
-                <a href="tooling/gh-credential-multi-account-403.html">&quot;gh auth git-credential が ~/.git-credentials より優先され別 org への push が 403&quot;</a>
+            <div class="error-card" data-tags="git,credential,gh-cli,multi-account,github" data-title="gh auth git-credential が ~/.git-credentials より優先され別 org への push が 403" data-text="症状 が以下で失敗する: に が存在するのに、 として認証されてしまう。 原因 が に以下を書き込む: この設定が より優先され、gh のアクティブアカウント （この場合 ）で認証される。 で override しても が残るため効かない。 解決策 push URL に直接 PAT を埋め込んでクレデンシャルヘルパーをバイパス: 予防 複数 GitHub アカウントを扱うリポジトリでは、remote URL に username を含める: または でアクティブアカウントを切り替えてから push PAT は gopass に登録しておくと取り出しやすい">
+                <a href="tooling/gh-credential-multi-account-403.html">gh auth git-credential が ~/.git-credentials より優先され別 org への push が 403</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
@@ -754,30 +754,30 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;multi-account&quot;)">multi-account</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
             </div>
-            <div class="error-card" data-tags="github-cli,gh,issues" data-title="&quot;gh issue create でラベルが存在しない場合 Issue 自体も作成されない&quot;" data-text="症状 を実行したとき、ラベルが存在しないリポジトリでは以下の警告だけ出て Issue が作成されなかった。 終了コードは 0 のように見えたが、実際には Issue が作成されていなかった。 原因 は でラベルが見つからない場合、処理全体を中断する（警告を出して終了するが Issue は未作成）。 解決策 ラベルなしで作成するか、 を直接使う: ラベルが必要な場合は Issue 作成後に別途付与: 予防 ラベルが存在しないリポジトリで を使わない。 経由の POST は オプションがないため、ラベル未存在でも失敗しない。">
-                <a href="tooling/gh-issue-create-label-silent-fail.html">&quot;gh issue create でラベルが存在しない場合 Issue 自体も作成されない&quot;</a>
+            <div class="error-card" data-tags="github-cli,gh,issues" data-title="gh issue create でラベルが存在しない場合 Issue 自体も作成されない" data-text="症状 を実行したとき、ラベルが存在しないリポジトリでは以下の警告だけ出て Issue が作成されなかった。 終了コードは 0 のように見えたが、実際には Issue が作成されていなかった。 原因 は でラベルが見つからない場合、処理全体を中断する（警告を出して終了するが Issue は未作成）。 解決策 ラベルなしで作成するか、 を直接使う: ラベルが必要な場合は Issue 作成後に別途付与: 予防 ラベルが存在しないリポジトリで を使わない。 経由の POST は オプションがないため、ラベル未存在でも失敗しない。">
+                <a href="tooling/gh-issue-create-label-silent-fail.html">gh issue create でラベルが存在しない場合 Issue 自体も作成されない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github-cli&quot;)">github-cli</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;gh&quot;)">gh</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;issues&quot;)">issues</span>
             </div>
-            <div class="error-card" data-tags="tooling" data-title="&quot;git checkout -b 後も別ブランチにコミットされた&quot;" data-text="症状 コミットログの先頭が となり、別ブランチに乗った。 原因 複数の Bash ツール呼び出しを分けたセッション中、 の実行が別ディレクトリ （または worktree）上で走り、 が意図通りに 切り替わらないまま「branch created」と表示された可能性。もしくは前の Bash セッションの カレントディレクトリが別 repo になっていたため、checkout が違うリポジトリに対して 実行された。 修正手順 1. 誤ったブランチから でロールバック（ は禁止） 2. で改めてブランチを作る 3. で正しいブランチにコミットを移植 4. 古い誤ったリモートブランチを で削除 予防策 直前に必ず で現在ブランチを確認する 後に即 を実行して期待するブランチになっているか確認する 複数 Bash 呼び出しを連続させるとき で リポジトリを明示的に指定する">
-                <a href="tooling/git-checkout-branch-confusion.html">&quot;git checkout -b 後も別ブランチにコミットされた&quot;</a>
+            <div class="error-card" data-tags="tooling" data-title="git checkout -b 後も別ブランチにコミットされた" data-text="症状 コミットログの先頭が となり、別ブランチに乗った。 原因 複数の Bash ツール呼び出しを分けたセッション中、 の実行が別ディレクトリ （または worktree）上で走り、 が意図通りに 切り替わらないまま「branch created」と表示された可能性。もしくは前の Bash セッションの カレントディレクトリが別 repo になっていたため、checkout が違うリポジトリに対して 実行された。 修正手順 1. 誤ったブランチから でロールバック（ は禁止） 2. で改めてブランチを作る 3. で正しいブランチにコミットを移植 4. 古い誤ったリモートブランチを で削除 予防策 直前に必ず で現在ブランチを確認する 後に即 を実行して期待するブランチになっているか確認する 複数 Bash 呼び出しを連続させるとき で リポジトリを明示的に指定する">
+                <a href="tooling/git-checkout-branch-confusion.html">git checkout -b 後も別ブランチにコミットされた</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;tooling&quot;)">tooling</span>
             </div>
-            <div class="error-card" data-tags="git,worktree,rebase" data-title="&quot;worktree で push 失敗 — リモートブランチに前セッションの別実装が存在&quot;" data-text="症状 リベース試行で add/add コンフリクト（両側が同じファイルを新規追加）。 原因 別セッションが同名ブランチ で異なる内容をすでに push 済み。 ローカルは から新規作成した同名ブランチだったため、リモートの履歴と分岐していた。 解決策 予防 セッション開始時に でリモートの同名ブランチ存在を確認する。 存在する場合は でリモートを追跡してから作業開始する。">
-                <a href="tooling/git-worktree-remote-branch-conflict.html">&quot;worktree で push 失敗 — リモートブランチに前セッションの別実装が存在&quot;</a>
+            <div class="error-card" data-tags="git,worktree,rebase" data-title="worktree で push 失敗 — リモートブランチに前セッションの別実装が存在" data-text="症状 リベース試行で add/add コンフリクト（両側が同じファイルを新規追加）。 原因 別セッションが同名ブランチ で異なる内容をすでに push 済み。 ローカルは から新規作成した同名ブランチだったため、リモートの履歴と分岐していた。 解決策 予防 セッション開始時に でリモートの同名ブランチ存在を確認する。 存在する場合は でリモートを追跡してから作業開始する。">
+                <a href="tooling/git-worktree-remote-branch-conflict.html">worktree で push 失敗 — リモートブランチに前セッションの別実装が存在</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;worktree&quot;)">worktree</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;rebase&quot;)">rebase</span>
             </div>
-            <div class="error-card" data-tags="gitleaks,git,security,ci" data-title="&quot;gitleaks が修正済みコミットの旧 API キーを検出する — squash が必要&quot;" data-text="症状 PR に「①キーをハードコード」「②env var に修正」の 2 コミットが含まれると、 gitleaks が ① の diff を検出して fail する（② で修正済みでも）。 原因 gitleaks は PR 範囲の全コミット diff をスキャンする。 最終的なファイルにキーが残っていなくても、git 履歴の diff に含まれていれば検出される。 解決策 2 コミットを squash して force push（feature ブランチのみ）: は settings.json deny 設定のため Claude Code から直接実行不可。 ユーザーがターミナルで手動実行する必要がある。 予防 初回コミット時点で env var を使う（後から修正しない） を最初から書く">
-                <a href="tooling/gitleaks-squash-needed.html">&quot;gitleaks が修正済みコミットの旧 API キーを検出する — squash が必要&quot;</a>
+            <div class="error-card" data-tags="gitleaks,git,security,ci" data-title="gitleaks が修正済みコミットの旧 API キーを検出する — squash が必要" data-text="症状 PR に「①キーをハードコード」「②env var に修正」の 2 コミットが含まれると、 gitleaks が ① の diff を検出して fail する（② で修正済みでも）。 原因 gitleaks は PR 範囲の全コミット diff をスキャンする。 最終的なファイルにキーが残っていなくても、git 履歴の diff に含まれていれば検出される。 解決策 2 コミットを squash して force push（feature ブランチのみ）: は settings.json deny 設定のため Claude Code から直接実行不可。 ユーザーがターミナルで手動実行する必要がある。 予防 初回コミット時点で env var を使う（後から修正しない） を最初から書く">
+                <a href="tooling/gitleaks-squash-needed.html">gitleaks が修正済みコミットの旧 API キーを検出する — squash が必要</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;gitleaks&quot;)">gitleaks</span>
@@ -785,15 +785,15 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;security&quot;)">security</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
             </div>
-            <div class="error-card" data-tags="tooling,git" data-title="&quot;global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする&quot;" data-text="global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする **severity**: medium **category**: tooling / git **date**: 2026-07-13 症状 が通らない。 に を追加してもエラーが変わらない。 原因 に Unity 由来の パターンが含まれている。 グローバル gitignore はリポ内の より優先されるのではなく、 **リポ内の の override ( ) が効かない**ことが問題。 実際には 経由のグローバル無視と、リポ内の の関係: グローバルで無視されたパスはリポ内 の で復活させることができる。 解決策 各ログリポに を作成し、明示的に un-ignore する: 両方書かないと効かない場合があるため両方追加する。 予防 logs/ ディレクトリを git 管理するリポを新規作成する際は最初にこの を追加する。">
-                <a href="tooling/global-gitignore-logs-dir.html">&quot;global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする&quot;</a>
+            <div class="error-card" data-tags="tooling,git" data-title="global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする" data-text="global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする **severity**: medium **category**: tooling / git **date**: 2026-07-13 症状 が通らない。 に を追加してもエラーが変わらない。 原因 に Unity 由来の パターンが含まれている。 グローバル gitignore はリポ内の より優先されるのではなく、 **リポ内の の override ( ) が効かない**ことが問題。 実際には 経由のグローバル無視と、リポ内の の関係: グローバルで無視されたパスはリポ内 の で復活させることができる。 解決策 各ログリポに を作成し、明示的に un-ignore する: 両方書かないと効かない場合があるため両方追加する。 予防 logs/ ディレクトリを git 管理するリポを新規作成する際は最初にこの を追加する。">
+                <a href="tooling/global-gitignore-logs-dir.html">global gitignore の [Ll]ogs/ がログリポの logs/ をブロックする</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;tooling&quot;)">tooling</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
             </div>
-            <div class="error-card" data-tags="husky,bash,sh,hook" data-title="&quot;husky pre-commit hook で [[ ]] を使うと /bin/sh 環境でエラーになる&quot;" data-text="症状 commit は通るが警告が出る。 原因 husky v9 の hook は で実行される。 は bash 拡張で POSIX sh には存在しない。 対策 の代わりに 文または (単括弧) を使う。 関連 #757 pre-commit hook 実装 PR #758">
-                <a href="tooling/husky-pre-commit-posix-sh-bracket.html">&quot;husky pre-commit hook で [[ ]] を使うと /bin/sh 環境でエラーになる&quot;</a>
+            <div class="error-card" data-tags="husky,bash,sh,hook" data-title="husky pre-commit hook で [[ ]] を使うと /bin/sh 環境でエラーになる" data-text="症状 commit は通るが警告が出る。 原因 husky v9 の hook は で実行される。 は bash 拡張で POSIX sh には存在しない。 対策 の代わりに 文または (単括弧) を使う。 関連 #757 pre-commit hook 実装 PR #758">
+                <a href="tooling/husky-pre-commit-posix-sh-bracket.html">husky pre-commit hook で [[ ]] を使うと /bin/sh 環境でエラーになる</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;husky&quot;)">husky</span>
@@ -801,8 +801,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;sh&quot;)">sh</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;hook&quot;)">hook</span>
             </div>
-            <div class="error-card" data-tags="pnpm,gh,issue-cmd,platform" data-title="&quot;pnpm issues:close が cwd に関係なく Platform リポの Issue に誤爆する&quot;" data-text="症状 fluxion リポで を実行したところ、 fluxion#47 ではなく **dev-nodee-infrastructure#47**（無関係な別 Issue・クローズ済み）に 完了コメントが投稿された。 原因 は Platform ルートの package.json スクリプト （ ）に解決され、pnpm がスクリプトをルートで実行するため cwd のリポ情報が使われず、既定リポ（Platform）の Issue 番号に対して操作される。 解決策 誤爆コメントは で削除 外部リポの Issue クローズは を PR に書いてマージ時 auto-close に任せる、 または を直接使う 予防 は **Platform リポの Issue 専用**と覚える 他リポでは使わない。改善するなら issue-cmd.mjs に オプション or cwd の git remote から対象リポを自動検出する機能を追加する（Issue 化済み）">
-                <a href="tooling/issues-close-cwd-cross-repo-misfire.html">&quot;pnpm issues:close が cwd に関係なく Platform リポの Issue に誤爆する&quot;</a>
+            <div class="error-card" data-tags="pnpm,gh,issue-cmd,platform" data-title="pnpm issues:close が cwd に関係なく Platform リポの Issue に誤爆する" data-text="症状 fluxion リポで を実行したところ、 fluxion#47 ではなく **dev-nodee-infrastructure#47**（無関係な別 Issue・クローズ済み）に 完了コメントが投稿された。 原因 は Platform ルートの package.json スクリプト （ ）に解決され、pnpm がスクリプトをルートで実行するため cwd のリポ情報が使われず、既定リポ（Platform）の Issue 番号に対して操作される。 解決策 誤爆コメントは で削除 外部リポの Issue クローズは を PR に書いてマージ時 auto-close に任せる、 または を直接使う 予防 は **Platform リポの Issue 専用**と覚える 他リポでは使わない。改善するなら issue-cmd.mjs に オプション or cwd の git remote から対象リポを自動検出する機能を追加する（Issue 化済み）">
+                <a href="tooling/issues-close-cwd-cross-repo-misfire.html">pnpm issues:close が cwd に関係なく Platform リポの Issue に誤爆する</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pnpm&quot;)">pnpm</span>
@@ -810,31 +810,31 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;issue-cmd&quot;)">issue-cmd</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;platform&quot;)">platform</span>
             </div>
-            <div class="error-card" data-tags="tooling,CI" data-title="&quot;pnpm 11 supply-chain policy で GitHub Actions CI が失敗する&quot;" data-text="pnpm 11 supply-chain policy で GitHub Actions CI が失敗する **severity**: high **category**: tooling / CI **date**: 2026-07-13 症状 が以下のエラーで失敗する: 原因 pnpm 11 (latest) は supply-chain attack 対策として ポリシーを導入。 公開から24時間以内のパッケージを自動ブロックする。 GitHub Actions の に を指定すると pnpm 11 がインストールされる。 解決策 で pnpm バージョンを に固定する: に を書く方法もあるが、ポリシーをオフにするより pnpm 10 を使う方が安全。 予防 新規リポの GitHub Pages CI テンプレートは最初から で固定する。 pnpm メジャーバージョンを上げる際はこのポリシーの影響を確認すること。">
-                <a href="tooling/pnpm-11-supply-chain-policy.html">&quot;pnpm 11 supply-chain policy で GitHub Actions CI が失敗する&quot;</a>
+            <div class="error-card" data-tags="tooling,CI" data-title="pnpm 11 supply-chain policy で GitHub Actions CI が失敗する" data-text="pnpm 11 supply-chain policy で GitHub Actions CI が失敗する **severity**: high **category**: tooling / CI **date**: 2026-07-13 症状 が以下のエラーで失敗する: 原因 pnpm 11 (latest) は supply-chain attack 対策として ポリシーを導入。 公開から24時間以内のパッケージを自動ブロックする。 GitHub Actions の に を指定すると pnpm 11 がインストールされる。 解決策 で pnpm バージョンを に固定する: に を書く方法もあるが、ポリシーをオフにするより pnpm 10 を使う方が安全。 予防 新規リポの GitHub Pages CI テンプレートは最初から で固定する。 pnpm メジャーバージョンを上げる際はこのポリシーの影響を確認すること。">
+                <a href="tooling/pnpm-11-supply-chain-policy.html">pnpm 11 supply-chain policy で GitHub Actions CI が失敗する</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;tooling&quot;)">tooling</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;CI&quot;)">CI</span>
             </div>
-            <div class="error-card" data-tags="pnpm,workspace,ci" data-title="&quot;pnpm install が親の pnpm-workspace.yaml に引っ張られてサブディレクトリで正しく動かない&quot;" data-text="症状 で を実行すると と出て 771ms で終わる。 が更新されない。 CI で が発生し、lockfile の specifiers が package.json と不一致になる。 原因 （Platform リポジトリ）が空でも存在するため、 サブディレクトリで を実行するとワークスペースルートとして認識され、 サブディレクトリの ではなくルートの install が走る。 解決策 フラグで親ワークスペースを無視して単体パッケージとして install できる。 は の TTY チェックを回避するために必要。 予防 Platform リポジトリ配下のサブプロジェクトで pnpm を使う場合は必ず を付ける CI スクリプト・Makefile にあらかじめ記載しておく">
-                <a href="tooling/pnpm-install-workspace-hoisting.html">&quot;pnpm install が親の pnpm-workspace.yaml に引っ張られてサブディレクトリで正しく動かない&quot;</a>
+            <div class="error-card" data-tags="pnpm,workspace,ci" data-title="pnpm install が親の pnpm-workspace.yaml に引っ張られてサブディレクトリで正しく動かない" data-text="症状 で を実行すると と出て 771ms で終わる。 が更新されない。 CI で が発生し、lockfile の specifiers が package.json と不一致になる。 原因 （Platform リポジトリ）が空でも存在するため、 サブディレクトリで を実行するとワークスペースルートとして認識され、 サブディレクトリの ではなくルートの install が走る。 解決策 フラグで親ワークスペースを無視して単体パッケージとして install できる。 は の TTY チェックを回避するために必要。 予防 Platform リポジトリ配下のサブプロジェクトで pnpm を使う場合は必ず を付ける CI スクリプト・Makefile にあらかじめ記載しておく">
+                <a href="tooling/pnpm-install-workspace-hoisting.html">pnpm install が親の pnpm-workspace.yaml に引っ張られてサブディレクトリで正しく動かない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pnpm&quot;)">pnpm</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;workspace&quot;)">workspace</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
             </div>
-            <div class="error-card" data-tags="pnpm,workspace,node_modules" data-title="&quot;pnpm workspace 未登録サブディレクトリで install が効かない&quot;" data-text="症状 に未登録のサブディレクトリ（例: ）で を実行しても、ローカルに が作られない。 ルートの workspace install が走るだけで依存が解決されない。 原因 pnpm はサブディレクトリで実行しても、親ディレクトリに があれば そのルートに対して install を実行する。 の （空リスト）でも同様で、 対象ディレクトリが workspace メンバーでなければパッケージはインストールされない。 に を追加しても **効果なし**（pnpm v10 時点）。 解決策 workspace 外のスタンドアロンスクリプトには を使う： または pnpm を使いたい場合は に追加する： 予防 配下にスタンドアロン Node.js スクリプトを置く場合は を使う husky などの prepare hook が workspace 全体に干渉するため、 も検討">
-                <a href="tooling/pnpm-workspace-subdir-install.html">&quot;pnpm workspace 未登録サブディレクトリで install が効かない&quot;</a>
+            <div class="error-card" data-tags="pnpm,workspace,node_modules" data-title="pnpm workspace 未登録サブディレクトリで install が効かない" data-text="症状 に未登録のサブディレクトリ（例: ）で を実行しても、ローカルに が作られない。 ルートの workspace install が走るだけで依存が解決されない。 原因 pnpm はサブディレクトリで実行しても、親ディレクトリに があれば そのルートに対して install を実行する。 の （空リスト）でも同様で、 対象ディレクトリが workspace メンバーでなければパッケージはインストールされない。 に を追加しても **効果なし**（pnpm v10 時点）。 解決策 workspace 外のスタンドアロンスクリプトには を使う： または pnpm を使いたい場合は に追加する： 予防 配下にスタンドアロン Node.js スクリプトを置く場合は を使う husky などの prepare hook が workspace 全体に干渉するため、 も検討">
+                <a href="tooling/pnpm-workspace-subdir-install.html">pnpm workspace 未登録サブディレクトリで install が効かない</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pnpm&quot;)">pnpm</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;workspace&quot;)">workspace</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;node_modules&quot;)">node_modules</span>
             </div>
-            <div class="error-card" data-tags="ruff,isort,python,ci" data-title="&quot;ruff I001: from import ブロック内の名前順序違反&quot;" data-text="症状 CI の lint ステップ（ ）が以下で失敗: ブロック内で を より前に書いた。 原因 ruff の ルール（isort 準拠）は ブロック内の名前も**アルファベット順**を要求する。 で始まる2名前の比較: → → なので が先でなければならない。 解決策 予防 複数関数を でまとめる際は常にアルファベット順に並べる ローカルで を実行してから push すると自動修正される 同じ頭文字の名前が混在する場合は2〜3文字目まで比較する習慣をつける">
-                <a href="tooling/ruff-isort-import-within-block.html">&quot;ruff I001: from import ブロック内の名前順序違反&quot;</a>
+            <div class="error-card" data-tags="ruff,isort,python,ci" data-title="ruff I001: from import ブロック内の名前順序違反" data-text="症状 CI の lint ステップ（ ）が以下で失敗: ブロック内で を より前に書いた。 原因 ruff の ルール（isort 準拠）は ブロック内の名前も**アルファベット順**を要求する。 で始まる2名前の比較: → → なので が先でなければならない。 解決策 予防 複数関数を でまとめる際は常にアルファベット順に並べる ローカルで を実行してから push すると自動修正される 同じ頭文字の名前が混在する場合は2〜3文字目まで比較する習慣をつける">
+                <a href="tooling/ruff-isort-import-within-block.html">ruff I001: from import ブロック内の名前順序違反</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ruff&quot;)">ruff</span>
@@ -842,8 +842,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;python&quot;)">python</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;ci&quot;)">ci</span>
             </div>
-            <div class="error-card" data-tags="worktree,husky,lint-staged,pnpm" data-title="&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;" data-text="症状 worktree 内で すると で失敗。 原因 git worktree は node_modules を共有しない。husky の pre-commit hook は worktree 側の node_modules から lint-staged を探すため、未インストールだと失敗する。 解決策 worktree ルートで一度だけ実行: pnpm store キャッシュが効くため数秒で完了する。 予防 worktree 作成直後に をセットで実行する での回避は prettier/black が走らずフォーマット差分が残るので使わない">
-                <a href="tooling/worktree-husky-lint-staged-missing.html">&quot;git worktree 内で husky pre-commit が lint-staged not found で失敗&quot;</a>
+            <div class="error-card" data-tags="worktree,husky,lint-staged,pnpm" data-title="git worktree 内で husky pre-commit が lint-staged not found で失敗" data-text="症状 worktree 内で すると で失敗。 原因 git worktree は node_modules を共有しない。husky の pre-commit hook は worktree 側の node_modules から lint-staged を探すため、未インストールだと失敗する。 解決策 worktree ルートで一度だけ実行: pnpm store キャッシュが効くため数秒で完了する。 予防 worktree 作成直後に をセットで実行する での回避は prettier/black が走らずフォーマット差分が残るので使わない">
+                <a href="tooling/worktree-husky-lint-staged-missing.html">git worktree 内で husky pre-commit が lint-staged not found で失敗</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;worktree&quot;)">worktree</span>
@@ -851,8 +851,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;lint-staged&quot;)">lint-staged</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pnpm&quot;)">pnpm</span>
             </div>
-            <div class="error-card" data-tags="wsl2,k3s,sudo,systemd" data-title="&quot;k3s WSL2 インストール が sudo でハング（30+分）&quot;" data-text="症状 YUKI WSL2 Ubuntu で k3s インストールコマンド実行時に sudo で権限昇格しようとしたが、パスワード入力を求められてハング（50+ 分）。 原因 WSL2 では systemd が init になっており、sudo を使う場合は **パスワード認証が必須**。 リモート SSH セッションからパスワード入力できず、タイムアウト。 解決策 sudo ではなく を使って直接 root で実行: これにより: パスワード入力不要 WSL Ubuntu 内で root shell で直接実行 タイムアウトなし 予防 WSL2 内での root 実行が必要な場合は ではなく 経由で行う。 特に CI/CD パイプラインからの自動実行時に有効。">
-                <a href="tooling/wsl2-k3s-sudo-hang.html">&quot;k3s WSL2 インストール が sudo でハング（30+分）&quot;</a>
+            <div class="error-card" data-tags="wsl2,k3s,sudo,systemd" data-title="k3s WSL2 インストール が sudo でハング（30+分）" data-text="症状 YUKI WSL2 Ubuntu で k3s インストールコマンド実行時に sudo で権限昇格しようとしたが、パスワード入力を求められてハング（50+ 分）。 原因 WSL2 では systemd が init になっており、sudo を使う場合は **パスワード認証が必須**。 リモート SSH セッションからパスワード入力できず、タイムアウト。 解決策 sudo ではなく を使って直接 root で実行: これにより: パスワード入力不要 WSL Ubuntu 内で root shell で直接実行 タイムアウトなし 予防 WSL2 内での root 実行が必要な場合は ではなく 経由で行う。 特に CI/CD パイプラインからの自動実行時に有効。">
+                <a href="tooling/wsl2-k3s-sudo-hang.html">k3s WSL2 インストール が sudo でハング（30+分）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;wsl2&quot;)">wsl2</span>
@@ -860,8 +860,8 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;sudo&quot;)">sudo</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;systemd&quot;)">systemd</span>
             </div>
-            <div class="error-card" data-tags="git,zenn,binary-file" data-title="&quot;zenn-content の db/zenn.db がリベース時にバイナリコンフリクト&quot;" data-text="症状 後に でコンフリクト。 自動マージ不可（バイナリファイルのため）。 原因 は Zenn 自動ジョブ（trending keywords fetch）が定期更新するバイナリ。 ローカルに stash していた変更と競合した。 解決策 リモート版を採用する（ローカルの zenn.db 変更は通常不要）: 予防 zenn-content での作業前に を先に実行する。 または を .gitignore に加えることを検討（自動ジョブが管理するファイルのため）。">
-                <a href="tooling/zenn-db-binary-rebase-conflict.html">&quot;zenn-content の db/zenn.db がリベース時にバイナリコンフリクト&quot;</a>
+            <div class="error-card" data-tags="git,zenn,binary-file" data-title="zenn-content の db/zenn.db がリベース時にバイナリコンフリクト" data-text="症状 後に でコンフリクト。 自動マージ不可（バイナリファイルのため）。 原因 は Zenn 自動ジョブ（trending keywords fetch）が定期更新するバイナリ。 ローカルに stash していた変更と競合した。 解決策 リモート版を採用する（ローカルの zenn.db 変更は通常不要）: 予防 zenn-content での作業前に を先に実行する。 または を .gitignore に加えることを検討（自動ジョブが管理するファイルのため）。">
+                <a href="tooling/zenn-db-binary-rebase-conflict.html">zenn-content の db/zenn.db がリベース時にバイナリコンフリクト</a>
                 <span class="severity severity-low">low</span>
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
@@ -870,7 +870,7 @@
             </div>
         </div>
         <footer>
-            <p>Last updated: 2026-08-16 16:11:48</p>
+            <p>Last updated: 2026-08-16 16:15:54</p>
             <p><a href="https://github.com/flipslidersand-labs/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
