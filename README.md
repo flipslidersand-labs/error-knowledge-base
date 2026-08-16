@@ -259,7 +259,7 @@ Web UI は見やすさと複数エラーの横断検索が利点です。
 
 ```bash
 # 必要なパッケージをインストール
-pip install markdown
+pip install -r requirements.txt
 python scripts/build.py
 ```
 
