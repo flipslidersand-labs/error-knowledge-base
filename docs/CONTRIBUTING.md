@@ -26,9 +26,15 @@ cp docs/ERROR_TEMPLATE.md errors/[category]/[error-name].md
 - `python/` — Python, pip, venv など
 - `javascript/` — Node.js, npm, JavaScript など
 - `go/` — Go, modules, build など
+- `rust/` — Rust, cargo, tokio など
 - `database/` — SQL, MongoDB, PostgreSQL など
-- `deployment/` — GitHub Actions, CI/CD, デプロイなど
+- `deployment/` — デプロイ, Docker, k8s, ARC など
+- `ci/` — CI パイプライン, runner, Actions ワークフローなど
+- `infra/` — VPS, ネットワーク, Vault, SSH, WSL2 など
 - `system/` — OS, 環境変数、PATH, 権限など
+- `github/` — GitHub の PR/Issue/権限まわりの挙動など
+- `tooling/` — git, pnpm, husky, worktree など
+- `runtime/` — ライブラリ API 変更・実行時挙動など
 - `other/` — その他
 
 ### 2. フロントマターを記入する
