@@ -8,9 +8,8 @@ on:
 
 jobs:
   # pyproject を持たない repo なので install-command で依存を明示的に入れる。
-  # NOTE: qa-workflows#2 マージ後に @main へ戻す（現在は検証のため feature ブランチ ref）。
   test:
-    uses: flipslidersand-labs/qa-workflows/.github/workflows/python-test.yml@feat/python-test-tierc-support
+    uses: flipslidersand-labs/qa-workflows/.github/workflows/python-test.yml@main
     with:
       install-command: "pip install -r requirements.txt pytest pytest-cov"
       coverage-threshold: 30
