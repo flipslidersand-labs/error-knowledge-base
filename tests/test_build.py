@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """build.py の frontmatter 正規化に対する回帰テスト（pytest 非依存）。
 
-    python tests/test_build.py
+python tests/test_build.py
 """
+
 import importlib.util
 from pathlib import Path
 

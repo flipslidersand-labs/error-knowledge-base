@@ -3,23 +3,49 @@
 Markdown エラー記録を HTML に変換して GitHub Pages 用に出力
 タグシステム・検索機能付き
 """
-import os
-import re
-import json
+
 import html
-import markdown
-import bleach
-import yaml
-from pathlib import Path
+import json
+import re
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
+
+import bleach
+import markdown
+import yaml
 
 # markdown レンダリング結果のサニタイズ許可リスト（外部 PR 由来の生 HTML/script を除去）
 ALLOWED_TAGS = [
-    "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
-    "code", "pre", "a", "strong", "em", "b", "i", "blockquote",
-    "table", "thead", "tbody", "tr", "th", "td", "hr", "br",
-    "span", "div", "img",
+    "p",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "ul",
+    "ol",
+    "li",
+    "code",
+    "pre",
+    "a",
+    "strong",
+    "em",
+    "b",
+    "i",
+    "blockquote",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "hr",
+    "br",
+    "span",
+    "div",
+    "img",
 ]
 ALLOWED_ATTRS = {
     "a": ["href", "title"],
@@ -35,6 +61,7 @@ ALLOWED_ATTRS = {
 def js_string(value: str) -> str:
     """HTML 属性内の JS 文字列リテラルとして安全に埋め込む（onclick 等）。"""
     return html.escape(json.dumps(value))
+
 
 VALID_SEVERITY = {"high", "medium", "low"}
 
@@ -60,11 +87,11 @@ def parse_frontmatter(text: str) -> Tuple[Dict, str]:
     値内カンマや引用符を含むタグも正しく扱える。YAML として不正な場合は
     空 meta にフォールバックし、本文だけを返す（ビルドは継続）。
     """
-    match = re.match(r'^---\s*\n(.*?)\n---\s*\n', text, re.DOTALL)
+    match = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.DOTALL)
     if not match:
         return {}, text
 
-    body = text[match.end():]
+    body = text[match.end() :]
     try:
         meta = yaml.safe_load(match.group(1)) or {}
         if not isinstance(meta, dict):
@@ -74,10 +101,12 @@ def parse_frontmatter(text: str) -> Tuple[Dict, str]:
 
     return meta, body
 
+
 def extract_h1(body: str) -> str:
     """本文から H1 タイトルを抽出"""
-    match = re.search(r'^#\s+(.+?)(?:\n|$)', body, re.MULTILINE)
+    match = re.search(r"^#\s+(.+?)(?:\n|$)", body, re.MULTILINE)
     return match.group(1) if match else ""
+
 
 def load_all_errors(errors_dir: Path) -> List[Dict]:
     """全エラーをロードしてメタデータを収集"""
@@ -94,53 +123,57 @@ def load_all_errors(errors_dir: Path) -> List[Dict]:
             meta, body = parse_frontmatter(text)
 
             # frontmatter がない場合、空の meta で処理継続
-            title = meta.get('title') or extract_h1(body) or md_file.stem
-            tags = normalize_tags(meta.get('tags'))
-            severity = normalize_severity(meta.get('severity'))
-            source = meta.get('source', 'web')  # デフォルト: web
+            title = meta.get("title") or extract_h1(body) or md_file.stem
+            tags = normalize_tags(meta.get("tags"))
+            severity = normalize_severity(meta.get("severity"))
+            source = meta.get("source", "web")  # デフォルト: web
 
             # 検索用テキスト（本文から Markdown 記号を除去）
             search_text = sanitize_text_for_search(body)[:500]
 
-            errors.append({
-                'category': category_name,
-                'stem': md_file.stem,
-                'html_path': f"{category_name}/{md_file.stem}.html",
-                'title': title,
-                'tags': tags,
-                'severity': severity,
-                'source': source,
-                'meta': meta,
-                'body_md': body,
-                'search_text': search_text,
-            })
+            errors.append(
+                {
+                    "category": category_name,
+                    "stem": md_file.stem,
+                    "html_path": f"{category_name}/{md_file.stem}.html",
+                    "title": title,
+                    "tags": tags,
+                    "severity": severity,
+                    "source": source,
+                    "meta": meta,
+                    "body_md": body,
+                    "search_text": search_text,
+                }
+            )
 
     return errors
 
+
 def sanitize_text_for_search(markdown_text: str) -> str:
     """Markdown テキストから記号を除去し、プレーンテキストに"""
-    text = re.sub(r'```.*?```', ' ', markdown_text, flags=re.DOTALL)  # コードブロック
-    text = re.sub(r'`[^`]+`', ' ', text)                              # インラインコード
-    text = re.sub(r'#+\s+', '', text)                                 # 見出し
-    text = re.sub(r'\|[^\n]+', ' ', text)                             # テーブル行
-    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)              # リンク
-    text = re.sub(r'[-*]\s+', '', text)                               # リスト
-    text = ' '.join(text.split())                                      # 正規化
+    text = re.sub(r"```.*?```", " ", markdown_text, flags=re.DOTALL)  # コードブロック
+    text = re.sub(r"`[^`]+`", " ", text)  # インラインコード
+    text = re.sub(r"#+\s+", "", text)  # 見出し
+    text = re.sub(r"\|[^\n]+", " ", text)  # テーブル行
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # リンク
+    text = re.sub(r"[-*]\s+", "", text)  # リスト
+    text = " ".join(text.split())  # 正規化
     return text
+
 
 def build_related(errors: List[Dict], current: Dict) -> List[Dict]:
     """関連エラーを取得（タグ共通度でソート、上位3件）"""
+
     def tag_score(e):
-        if not e['tags'] or not current['tags']:
+        if not e["tags"] or not current["tags"]:
             return 0
-        return len(set(e['tags']) & set(current['tags']))
+        return len(set(e["tags"]) & set(current["tags"]))
 
     related = sorted(
-        [e for e in errors if e['stem'] != current['stem']],
-        key=tag_score,
-        reverse=True
+        [e for e in errors if e["stem"] != current["stem"]], key=tag_score, reverse=True
     )
     return [e for e in related if tag_score(e) > 0][:3]
+
 
 def build():
     build_dir = Path("build")
@@ -150,7 +183,7 @@ def build():
     errors = load_all_errors(errors_dir)
 
     # 全タグを集約（重複排除）
-    all_tags = sorted(set(tag for e in errors for tag in e.get('tags', [])))
+    all_tags = sorted(set(tag for e in errors for tag in e.get("tags", [])))
 
     # インデックス HTML を作成
     index_css = """        * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -215,54 +248,53 @@ def build():
         index_html += f'            <span class="tag" onclick="filterByTag(this, {js_string(tag)})">{html.escape(tag)}</span>\n'
 
     index_html += '            <span class="tag" onclick="filterByTag(this, \'ALL\')" style="background:#eee">すべて</span>\n'
-    index_html += '        </div>\n'
+    index_html += "        </div>\n"
     index_html += '        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">\n'
 
     # source ごとにグループ分け（personal -> web）
-    for source_type in ['personal', 'web']:
-        source_errors = [e for e in errors if e.get('source', 'web') == source_type]
+    for source_type in ["personal", "web"]:
+        source_errors = [e for e in errors if e.get("source", "web") == source_type]
         if not source_errors:
             continue
 
-        source_label = '🎯 実体験' if source_type == 'personal' else '📚 参考・学習'
+        source_label = "🎯 実体験" if source_type == "personal" else "📚 参考・学習"
         index_html += f'        <h2 style="margin: 30px 0 15px; color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">{source_label}</h2>\n'
 
         # カテゴリごとにエラーカードを生成
-        categories_in_source = sorted(set(e['category'] for e in source_errors))
+        categories_in_source = sorted(set(e["category"] for e in source_errors))
 
         for category_name in categories_in_source:
-            category_errors = [e for e in source_errors if e['category'] == category_name]
+            category_errors = [e for e in source_errors if e["category"] == category_name]
 
             if not category_errors:
                 continue
 
-            index_html += f'        <div class="category">\n'
-            index_html += f'            <h3>📁 {category_name.upper()}</h3>\n'
+            index_html += '        <div class="category">\n'
+            index_html += f"            <h3>📁 {category_name.upper()}</h3>\n"
 
             for error in category_errors:
-                tags_str = ','.join(error.get('tags', []))
-                title = html.escape(error['title'])
-                search_text = html.escape(error['search_text'])
-                severity = html.escape(error.get('severity', 'medium'))
-                source = html.escape(error.get('source', 'web'))
-                source_label = '実体験' if source == 'personal' else '参考'
-                html_name = error['stem'] + ".html"
+                tags_str = ",".join(error.get("tags", []))
+                title = html.escape(error["title"])
+                search_text = html.escape(error["search_text"])
+                severity = html.escape(error.get("severity", "medium"))
+                source = html.escape(error.get("source", "web"))
+                source_label = "実体験" if source == "personal" else "参考"
 
                 index_html += f'            <div class="error-card" data-tags="{tags_str}" data-title="{title}" data-text="{search_text}">\n'
                 index_html += f'                <a href="{error["html_path"]}">{title}</a>\n'
                 index_html += f'                <span class="severity severity-{severity}">{severity}</span>\n'
                 index_html += f'                <span class="source-badge source-{source}">{source_label}</span>\n'
 
-                if error.get('tags'):
-                    for tag in error['tags']:
+                if error.get("tags"):
+                    for tag in error["tags"]:
                         index_html += f'                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, {js_string(tag)})">{html.escape(tag)}</span>\n'
 
-                index_html += '            </div>\n'
+                index_html += "            </div>\n"
 
-            index_html += '        </div>\n'
+            index_html += "        </div>\n"
 
     index_html += f"""        <footer>
-            <p>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            <p>Last updated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
             <p><a href="https://github.com/flipslidersand-labs/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
@@ -319,13 +351,12 @@ def build():
 
     # 各 Markdown ファイルを HTML に変換
     for error in errors:
-        category_name = error['category']
+        category_name = error["category"]
         output_dir = build_dir / category_name
         output_dir.mkdir(exist_ok=True)
 
         html_content = markdown.markdown(
-            error['body_md'],
-            extensions=['tables', 'fenced_code', 'codehilite']
+            error["body_md"], extensions=["tables", "fenced_code", "codehilite"]
         )
         # 外部 PR 由来の生 HTML/script を除去（stored XSS 対策）
         html_content = bleach.clean(
@@ -340,22 +371,22 @@ def build():
         related_html = ""
         if related:
             related_html = '        <div class="related-section">\n'
-            related_html += '            <h2>関連するエラー</h2>\n'
+            related_html += "            <h2>関連するエラー</h2>\n"
             related_html += '            <ul class="related-list">\n'
             for rel in related:
                 related_html += f'                <li><a href="../{rel["html_path"]}">{html.escape(rel["title"])}</a></li>\n'
-            related_html += '            </ul>\n'
-            related_html += '        </div>\n'
+            related_html += "            </ul>\n"
+            related_html += "        </div>\n"
 
         # タグを HTML に
         tags_html = ""
-        if error.get('tags'):
-            for tag in error['tags']:
+        if error.get("tags"):
+            for tag in error["tags"]:
                 tags_html += f'<span class="tag">{html.escape(tag)}</span> '
 
-        severity = html.escape(error.get('severity', 'medium'))
-        source = html.escape(error.get('source', 'web'))
-        source_label = '実体験' if source == 'personal' else '参考'
+        severity = html.escape(error.get("severity", "medium"))
+        source = html.escape(error.get("source", "web"))
+        source_label = "実体験" if source == "personal" else "参考"
 
         detail_css = """        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -399,7 +430,7 @@ def build():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{html.escape(error['title'])}</title>
+    <title>{html.escape(error["title"])}</title>
     <style>
 {detail_css}
     </style>
@@ -419,9 +450,10 @@ def build():
 </body>
 </html>
 """
-        (output_dir / (error['stem'] + ".html")).write_text(full_html, encoding="utf-8")
+        (output_dir / (error["stem"] + ".html")).write_text(full_html, encoding="utf-8")
 
     print(f"✅ Build complete: {build_dir}/index.html ({len(errors)} errors)")
+
 
 if __name__ == "__main__":
     build()

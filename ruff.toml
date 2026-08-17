@@ -1,0 +1,11 @@
+# pyproject を持たない repo 用の standalone ruff 設定（qa-platform #26 python-test 導入）。
+line-length = 100
+target-version = "py311"
+
+# エラーナレッジは Markdown 本体（コード例含む）が成果物。ruff 0.16 は .md 内の
+# Python コードブロックも整形するため、ドキュメントを勝手に書き換えないよう除外する。
+extend-exclude = ["*.md"]
+
+[lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]  # line-too-long is handled by the formatter
