@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # pyproject を持たない repo なので install-command で依存を明示的に入れる。
+  test:
+    uses: flipslidersand-labs/qa-workflows/.github/workflows/python-test.yml@main
+    with:
+      install-command: "pip install -r requirements.txt pytest pytest-cov"
+      coverage-threshold: 30
