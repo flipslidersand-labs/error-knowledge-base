@@ -15,7 +15,7 @@ CI で `ERR_PNPM_OUTDATED_LOCKFILE` が発生し、lockfile の specifiers が p
 
 ## 原因
 
-`/home/dev-nodee/projects/pnpm-workspace.yaml`（Platform リポジトリ）が空でも存在するため、
+`~/projects/pnpm-workspace.yaml`（Platform リポジトリ）が空でも存在するため、
 サブディレクトリで `pnpm` を実行するとワークスペースルートとして認識され、
 サブディレクトリの `package.json` ではなくルートの install が走る。
 

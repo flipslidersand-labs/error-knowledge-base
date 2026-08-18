@@ -13,7 +13,7 @@ date: "2026-08-16"
 `pnpm doc:ingest <url>` 実行時に Ollama から HTTP 404 が返り蒸留が失敗。
 
 ```
-POST http://192.168.68.56:11435/api/chat → 404
+POST http://<internal-host>:11435/api/chat → 404
 model "claude-haiku-4-5-20251001" not found
 ```
 

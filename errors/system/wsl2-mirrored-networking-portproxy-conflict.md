@@ -31,7 +31,7 @@ portproxy を完全削除する:
 
 ```powershell
 # 管理者 PowerShell
-netsh interface portproxy delete v4tov4 listenaddress=192.168.68.60 listenport=9100
+netsh interface portproxy delete v4tov4 listenaddress=<internal-host> listenport=9100
 # または全削除
 netsh interface portproxy reset
 ```

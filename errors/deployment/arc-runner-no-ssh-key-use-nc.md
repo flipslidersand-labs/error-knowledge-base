@@ -13,7 +13,7 @@ DS1 がオンラインになったか確認するために `ssh` を使ってい
 ARC runner pod 内に秘密鍵が存在しないため接続に失敗する。
 
 ```
-ssh: connect to host 192.168.68.60 port 22: Connection refused
+ssh: connect to host <internal-host> port 22: Connection refused
 Permission denied (publickey)
 ```
 
@@ -29,10 +29,10 @@ SSH の代わりに `nc`（netcat）でポート疎通確認に置き換える:
 
 ```bash
 # Before (SSH — ARC pod 内では不可)
-ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no user@192.168.68.60 "exit" 2>/dev/null
+ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no user@<internal-host> "exit" 2>/dev/null
 
 # After (nc — TCP 到達チェックのみ)
-nc -z -w3 192.168.68.60 22
+nc -z -w3 <internal-host> 22
 ```
 
 `-z`: ポートスキャンモード（データ送受信なし）

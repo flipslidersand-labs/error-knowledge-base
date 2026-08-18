@@ -9,7 +9,7 @@ date: "2026-08-08"
 ## 症状
 
 DS1 で Ollama が WSL2 内で "address already in use" で起動失敗。
-LAN から 192.168.68.60:11434 に TCP は繋がるが HTTP はコネクションリセット。
+LAN から <internal-host>:11434 に TCP は繋がるが HTTP はコネクションリセット。
 
 ## 原因
 

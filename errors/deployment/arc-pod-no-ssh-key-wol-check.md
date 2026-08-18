@@ -26,7 +26,7 @@ ARC runner は Kubernetes pod として起動する。pod 内には `~/.ssh/` �
 SSH の代わりに `nc` (netcat) で TCP 到達チェックを使う:
 
 ```bash
-if nc -z -w3 192.168.68.60 22 2>/dev/null; then
+if nc -z -w3 <internal-host> 22 2>/dev/null; then
   echo "DS1 is already online"
 fi
 ```

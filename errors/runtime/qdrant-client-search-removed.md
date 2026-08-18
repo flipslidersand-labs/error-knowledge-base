@@ -34,4 +34,4 @@ results = response.points  # .score / .payload を持つ
 ## 関連
 
 - scripts/ingest/qdrant.py の search() 関数
-- qdrant サーバ: 1.18.2 (MINIPC 192.168.68.63:6333)
+- qdrant サーバ: 1.18.2 (MINIPC <internal-host>:6333)

@@ -26,7 +26,7 @@ ping api.github.com  # ✓ 応答
 
 WSL2 **mirrored networking mode** では、pod outbound パケットが iptables **MASQUERADE** に失敗:
 
-- **mirrored mode**: pod が Windows ホストの IP を共有（192.168.68.56）
+- **mirrored mode**: pod が Windows ホストの IP を共有（<internal-host>）
 - iptables MASQUERADE で送信元を変換しようとしても、WSL2 kernel の制限で TCP ACK が戻らない
 - ICMP は kernel 処理で通るが、TCP は application layer なため詰まる
 
@@ -55,12 +55,12 @@ wsl --shutdown
 
 ### kubectl アクセスの復旧
 
-WSL2 IP が変わるため、**portproxy** で 192.168.68.56:6443 → 新 IP:6443 を設定:
+WSL2 IP が変わるため、**portproxy** で <internal-host>:6443 → 新 IP:6443 を設定:
 
 ```powershell
 # 動的に WSL2 IP を取得して portproxy 設定
 $wslIp = (wsl -u root bash -c "ip addr show eth0 | grep -oP '(?<=inet )[0-9.]+'" ).Trim()
-netsh interface portproxy add v4tov4 listenport=6443 listenaddress=192.168.68.56 connectport=6443 connectaddress=$wslIp
+netsh interface portproxy add v4tov4 listenport=6443 listenaddress=<internal-host> connectport=6443 connectaddress=$wslIp
 ```
 
 ## 予防
