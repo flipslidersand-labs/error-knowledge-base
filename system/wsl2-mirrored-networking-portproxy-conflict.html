@@ -71,7 +71,7 @@ portproxy は NAT モード用の仕組みであり、mirrored では不要か�
 <h2>解決策</h2>
 <p>portproxy を完全削除する:</p>
 <div class="codehilite"><pre><span></span><code><span class="c"># 管理者 PowerShell</span>
-<span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">delete</span> <span class="n">v4tov4</span> <span class="n">listenaddress</span><span class="p">=</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">68</span><span class="p">.</span><span class="n">60</span> <span class="n">listenport</span><span class="p">=</span><span class="n">9100</span>
+<span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">delete</span> <span class="n">v4tov4</span> <span class="n">listenaddress</span><span class="p">=&lt;</span><span class="n">internal-host</span><span class="p">&gt;</span> <span class="n">listenport</span><span class="p">=</span><span class="n">9100</span>
 <span class="c"># または全削除</span>
 <span class="n">netsh</span> <span class="n">interface</span> <span class="n">portproxy</span> <span class="n">reset</span>
 </code></pre></div>

@@ -55,7 +55,7 @@
         <h1>Ollama HTTP 404: --model デフォルトが Anthropic モデル名</h1>
 <h2>症状</h2>
 <p><code>pnpm doc:ingest &lt;url&gt;</code> 実行時に Ollama から HTTP 404 が返り蒸留が失敗。</p>
-<div class="codehilite"><pre><span></span><code>POST http://<internal-ip>:11435/api/chat → 404
+<div class="codehilite"><pre><span></span><code>POST http://&lt;internal-host&gt;:11435/api/chat → 404
 model &quot;claude-haiku-4-5-20251001&quot; not found
 </code></pre></div>
 

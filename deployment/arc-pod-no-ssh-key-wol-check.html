@@ -64,7 +64,7 @@ ssh<span class="w"> </span>-o<span class="w"> </span><span class="nv">ConnectTim
 <code>BatchMode=yes</code> のため認証失敗で即 exit=1 → 常に「DS1 オフライン」と判定。</p>
 <h2>解決策</h2>
 <p>SSH の代わりに <code>nc</code> (netcat) で TCP 到達チェックを使う:</p>
-<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span>nc<span class="w"> </span>-z<span class="w"> </span>-w3<span class="w"> </span><span class="m">192</span>.168.68.60<span class="w"> </span><span class="m">22</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span>nc<span class="w"> </span>-z<span class="w"> </span>-w3<span class="w"> </span>&lt;internal-host&gt;<span class="w"> </span><span class="m">22</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;DS1 is already online&quot;</span>
 <span class="k">fi</span>
 </code></pre></div>

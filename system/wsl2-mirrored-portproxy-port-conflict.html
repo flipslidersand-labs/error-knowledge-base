@@ -54,7 +54,7 @@
         </div>
         <h2>症状</h2>
 <p>DS1 で Ollama が WSL2 内で "address already in use" で起動失敗。
-LAN から <internal-ip>:11434 に TCP は繋がるが HTTP はコネクションリセット。</p>
+LAN から :11434 に TCP は繋がるが HTTP はコネクションリセット。</p>
 <h2>原因</h2>
 <p><code>netsh interface portproxy add v4tov4 listenport=11434 connectaddress=127.0.0.1</code> を設定すると、
 mirrored networking モードでは Windows の svchost(iphlpsvc) が先に <code>0.0.0.0:11434</code> を確保する。

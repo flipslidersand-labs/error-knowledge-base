@@ -57,7 +57,7 @@
 <code>../.. prepare: Done</code> と出て 771ms で終わる。<code>pnpm-lock.yaml</code> が更新されない。</p>
 <p>CI で <code>ERR_PNPM_OUTDATED_LOCKFILE</code> が発生し、lockfile の specifiers が package.json と不一致になる。</p>
 <h2>原因</h2>
-<p><code>/home/<user>/projects/pnpm-workspace.yaml</code>（Platform リポジトリ）が空でも存在するため、
+<p><code>~/projects/pnpm-workspace.yaml</code>（Platform リポジトリ）が空でも存在するため、
 サブディレクトリで <code>pnpm</code> を実行するとワークスペースルートとして認識され、
 サブディレクトリの <code>package.json</code> ではなくルートの install が走る。</p>
 <h2>解決策</h2>

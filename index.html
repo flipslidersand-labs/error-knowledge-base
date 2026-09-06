@@ -325,6 +325,15 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;branch-protection&quot;)">branch-protection</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;auto-fix&quot;)">auto-fix</span>
             </div>
+            <div class="error-card" data-tags="git,github,pr,stacked-pr" data-title="PR チェーンの最終ブランチが main に届かない" data-text="症状 issue ブランチ間で PR を順番にマージした（#6→feat/issue-1, #7→feat/issue-2, …）が、 main には最初の PR しか反映されておらず、 が短いままだった。 原因 でブランチ同士を繋いだため、 最終ブランチ (feat/issue-N) を main にマージする手順が抜けていた。 中間ブランチへのマージは成功しているが、main には到達していない。 解決策 最終ブランチを main に直接マージする: 予防 PR チェーンを使う場合は、最後の PR のベースを必ず にする 全マージ後に で反映を確認する 関連: （base 未確認でマージした別パターン）">
+                <a href="github/pr-chain-final-not-merged-to-main.html">PR チェーンの最終ブランチが main に届かない</a>
+                <span class="severity severity-medium">medium</span>
+                <span class="source-badge source-personal">実体験</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;git&quot;)">git</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;github&quot;)">github</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;pr&quot;)">pr</span>
+                <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;stacked-pr&quot;)">stacked-pr</span>
+            </div>
             <div class="error-card" data-tags="github,pr,merge,stacked-pr" data-title="stacked PR を base 未確認でマージし master に入らなかった（PR #148）" data-text="症状 が成功し Issue も自動クローズされたのに、変更が master に無い。 原因 PR #148 の base が （stacked PR）だった。base の PR #147 を マージではなく **close*したため GitHub の自動 retarget が働かず、base が feature ブランチのまま残っていた。マージは成功したが行き先が master ではなかった。 解決策 master から新ブランチを切り、必要ファイルを Git Data API で単一コミット化して 別 PR（#166）として復旧マージ。 予防 マージ前に必ず base を確認する: stacked PR の親を close する場合、子 PR の base を手動で retarget する: 「MERGED = master に入った」ではない。マージ後は で確認できる">
                 <a href="github/stacked-pr-base-merge-wrong-target.html">stacked PR を base 未確認でマージし master に入らなかった（PR #148）</a>
                 <span class="severity severity-high">high</span>
@@ -608,7 +617,7 @@
         </div>
         <div class="category">
             <h3>📁 RUNTIME</h3>
-            <div class="error-card" data-tags="runtime" data-title="qdrant-client 1.18 で client.search() が廃止" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC <internal-ip>:6333)">
+            <div class="error-card" data-tags="runtime" data-title="qdrant-client 1.18 で client.search() が廃止" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC &lt;internal-host&gt;:6333)">
                 <a href="runtime/qdrant-client-search-removed.html">qdrant-client 1.18 で client.search() が廃止</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
@@ -675,7 +684,7 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;portproxy&quot;)">portproxy</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;node_exporter&quot;)">node_exporter</span>
             </div>
-            <div class="error-card" data-tags="wsl2,portproxy,ollama,windows,mirrored-networking" data-title="WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可" data-text="症状 DS1 で Ollama が WSL2 内で &quot;address already in use&quot; で起動失敗。 LAN から <internal-ip>:11434 に TCP は繋がるが HTTP はコネクションリセット。 原因 を設定すると、 mirrored networking モードでは Windows の svchost(iphlpsvc) が先に を確保する。 WSL2 から見た 127.0.0.1:11434 も同じ network namespace のため、Ollama が bind できない。 解決策 **mirrored networking で Ollama が直接 0.0.0.0:11434 をリッスンするサービスには portproxy を設定しない。*その後 Ollama を再起動すれば LAN から直接アクセス可能になる。 予防 から port 11434 を除外済み。 mirrored networking 環境では WSL2 サービスが で bind するポートには portproxy 不要。 portproxy が必要なのは NAT モード時">
+            <div class="error-card" data-tags="wsl2,portproxy,ollama,windows,mirrored-networking" data-title="WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可" data-text="症状 DS1 で Ollama が WSL2 内で &quot;address already in use&quot; で起動失敗。 LAN から &lt;internal-host&gt;:11434 に TCP は繋がるが HTTP はコネクションリセット。 原因 を設定すると、 mirrored networking モードでは Windows の svchost(iphlpsvc) が先に を確保する。 WSL2 から見た 127.0.0.1:11434 も同じ network namespace のため、Ollama が bind できない。 解決策 **mirrored networking で Ollama が直接 0.0.0.0:11434 をリッスンするサービスには portproxy を設定しない。*その後 Ollama を再起動すれば LAN から直接アクセス可能になる。 予防 から port 11434 を除外済み。 mirrored networking 環境では WSL2 サービスが で bind するポートには portproxy 不要。 portproxy が必要なのは NAT モー">
                 <a href="system/wsl2-mirrored-portproxy-port-conflict.html">WSL2 mirrored networking で portproxy が Ollama の port を先取りして起動不可</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
@@ -685,7 +694,7 @@
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;windows&quot;)">windows</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;mirrored-networking&quot;)">mirrored-networking</span>
             </div>
-            <div class="error-card" data-tags="wsl2,k3s,networking,iptables,pod" data-title="WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）" data-text="症状 YUKI WSL2 k3s の pod から への TCP 通信がタイムアウト: 一方、ICMP ping は成功: 原因 WSL2 **mirrored networking mode*では、pod outbound パケットが iptables **MASQUERADE*に失敗: **mirrored mode**: pod が Windows ホストの IP を共有（<internal-ip>） iptables MASQUERADE で送信元を変換しようとしても、WSL2 kernel の制限で TCP ACK が戻らない ICMP は kernel 処理で通るが、TCP は application layer なため詰まる kubeadm・k3s 両方とも同じ制限。 解決策 **NAT networking mode に切り替え**: を以下に変更（Windows 側）: WSL2 を再起動: 新しい IP で pod 起動（172.31.x.x 帯）。pod から TCP 443 が通るようになる。 kubectl アクセスの復旧 WSL2 IP が変わるため、**p">
+            <div class="error-card" data-tags="wsl2,k3s,networking,iptables,pod" data-title="WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）" data-text="症状 YUKI WSL2 k3s の pod から への TCP 通信がタイムアウト: 一方、ICMP ping は成功: 原因 WSL2 **mirrored networking mode*では、pod outbound パケットが iptables **MASQUERADE*に失敗: **mirrored mode**: pod が Windows ホストの IP を共有（&lt;internal-host&gt;） iptables MASQUERADE で送信元を変換しようとしても、WSL2 kernel の制限で TCP ACK が戻らない ICMP は kernel 処理で通るが、TCP は application layer なため詰まる kubeadm・k3s 両方とも同じ制限。 解決策 **NAT networking mode に切り替え**: を以下に変更（Windows 側）: WSL2 を再起動: 新しい IP で pod 起動（172.31.x.x 帯）。pod から TCP 443 が通るようになる。 kubectl アクセスの復旧 WSL2 IP が変わるため、*">
                 <a href="system/wsl2-pod-tcp-blocked-mirrored-networking.html">WSL2 k3s pod の TCP 443 ブロック（mirrored networking 時）</a>
                 <span class="severity severity-high">high</span>
                 <span class="source-badge source-personal">実体験</span>
@@ -870,7 +879,7 @@
             </div>
         </div>
         <footer>
-            <p>Last updated: 2026-08-17 13:49:31</p>
+            <p>Last updated: 2026-09-06 07:36:02</p>
             <p><a href="https://github.com/flipslidersand-labs/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
