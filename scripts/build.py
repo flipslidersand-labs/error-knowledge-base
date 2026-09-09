@@ -264,9 +264,7 @@ def build():
         categories_in_source = sorted(set(e["category"] for e in source_errors))
 
         for category_name in categories_in_source:
-            category_errors = [
-                e for e in source_errors if e["category"] == category_name
-            ]
+            category_errors = [e for e in source_errors if e["category"] == category_name]
 
             if not category_errors:
                 continue
@@ -283,9 +281,7 @@ def build():
                 source_label = "実体験" if source == "personal" else "参考"
 
                 index_html += f'            <div class="error-card" data-tags="{tags_str}" data-title="{title}" data-text="{search_text}">\n'
-                index_html += (
-                    f'                <a href="{error["html_path"]}">{title}</a>\n'
-                )
+                index_html += f'                <a href="{error["html_path"]}">{title}</a>\n'
                 index_html += f'                <span class="severity severity-{severity}">{severity}</span>\n'
                 index_html += f'                <span class="source-badge source-{source}">{source_label}</span>\n'
 

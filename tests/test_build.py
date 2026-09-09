@@ -15,9 +15,7 @@ _spec.loader.exec_module(b)
 
 
 def test_tags_with_inner_comma():
-    meta, _ = b.parse_frontmatter(
-        '---\ntitle: "t"\ntags: ["a, b", c]\nseverity: high\n---\nbody\n'
-    )
+    meta, _ = b.parse_frontmatter('---\ntitle: "t"\ntags: ["a, b", c]\nseverity: high\n---\nbody\n')
     assert meta["tags"] == ["a, b", "c"]
 
 
