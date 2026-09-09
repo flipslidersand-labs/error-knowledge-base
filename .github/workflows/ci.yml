@@ -13,3 +13,8 @@ jobs:
     with:
       install-command: "pip install -r requirements.txt pytest pytest-cov"
       coverage-threshold: 30
+
+  gitleaks:
+    permissions:
+      contents: read
+    uses: flipslidersand-labs/qa-workflows/.github/workflows/gitleaks.yml@main
