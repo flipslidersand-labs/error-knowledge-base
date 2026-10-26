@@ -19,18 +19,28 @@
 ```
 error-knowledge-base/
 ├── errors/                      # エラー記録（Markdown）
+│   ├── tooling/                 # ツール・CLI 関連
 │   ├── python/                  # Python 関連
-│   ├── javascript/              # JavaScript/Node.js 関連
-│   ├── database/                # データベース関連
 │   ├── deployment/              # デプロイメント関連
 │   ├── system/                  # OS/システム関連
+│   ├── infra/                   # インフラ関連
+│   ├── javascript/              # JavaScript/Node.js 関連
+│   ├── github/                  # GitHub 関連
+│   ├── go/                      # Go 関連
+│   ├── rust/                    # Rust 関連
+│   ├── database/                # データベース関連
+│   ├── ci/                      # CI 関連
+│   ├── runtime/                 # ランタイム関連
 │   └── other/                   # その他
 ├── docs/                        # ドキュメント
 │   ├── ERROR_TEMPLATE.md        # エラー記録テンプレート
-│   └── CONTRIBUTING.md          # 貢献ガイド
+│   ├── CONTRIBUTING.md          # 貢献ガイド
+│   └── adr/                     # 設計判断記録
 ├── scripts/                     # ユーティリティスクリプト
 │   └── build.py                 # Markdown → HTML 変換
+├── tests/                       # build.py のテスト
 ├── .github/workflows/           # GitHub Actions
+│   ├── ci.yml                   # テスト・gitleaks
 │   └── deploy.yml               # GitHub Pages 自動デプロイ
 └── README.md                    # このファイル
 ```
@@ -39,30 +49,27 @@ error-knowledge-base/
 
 ## クイックスタート
 
-### 1. リポジトリをセットアップ
+### 1. クローンしてビルド確認
 
 ```bash
-bash setup-repo.sh [your-github-username]
+git clone https://github.com/flipslidersand-labs/error-knowledge-base.git
 cd error-knowledge-base
+pip install -r requirements.txt
+python scripts/build.py
 ```
 
-### 2. 最初の commit をプッシュ
+### 2. 公開
 
-```bash
-git add .
-git commit -m "Initial commit: error knowledge base setup"
-git branch -M main
-git push -u origin main
-```
+`main` への push で `deploy.yml` が走り、GitHub Pages に公開されます。  
+公開先: `https://flipslidersand-labs.github.io/error-knowledge-base`
 
-### 3. GitHub Pages を有効化
+### 3. 他リポの CI 失敗の自動起票
 
-GitHub のリポジトリ設定で：
-- **Settings** → **Pages**
-- **Build and deployment** → **Branch** を `main` に設定
-- **Root** を選択
+他リポのスキャンで見つかった失敗は、`auto-scan` ラベルの Issue として自動で起票されます。
 
-これで自動的に `https://[username].github.io/error-knowledge-base` に公開されます。
+- 題名: `[リポ名] 言語: 失敗したコマンド`（例: `[self-profile] workflows: actionlint`）
+- 本文: 対象リポ・言語・コマンドと出力ログ
+- 解決したら Issue を close。再発防止の知見は `errors/` に記録します。
 
 ---
 
@@ -280,8 +287,7 @@ python scripts/build.py
 
 ---
 
-**最終更新**: 2024  
-**マネージャー**: [Your Name]
+**メンテナー**: flipslidersand-labs
 
 
 ## 設計判断 / Architecture decisions
