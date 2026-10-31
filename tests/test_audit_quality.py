@@ -52,6 +52,12 @@ def test_h1_sections_and_h1_title():
     assert audit(body) == []
 
 
+def test_cause_synonyms_condition_and_spec():
+    for head in ("発生条件", "正しい仕様"):
+        body = f"## 症状\n{PAD}\n## {head}\n{PAD}\n## 解決策\n{PAD}\n## 予防\n{PAD}\n"
+        assert audit(body) == []
+
+
 def test_hash_inside_code_fence_is_not_heading():
     body = f"## 症状\n```\n# 予防\n```\n{PAD}\n## 原因\n{PAD}\n## 解決策\n{PAD}\n"
     assert audit(body) == ["missing:prevention"]
