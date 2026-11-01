@@ -16,10 +16,10 @@ source: personal
 
 `docker exec vault-server tar -czf - /vault/file` は `/vault/file/core/...` 構造を出力する。
 
-`--strip-components=1` では `vault/file/core/...` が展開先 `/home/yuki/vault/file/` に対して
-`/home/yuki/vault/file/file/core/...` になる（`file/` がネスト）。
+`--strip-components=1` では `vault/file/core/...` が展開先 `/home/<user>/vault/file/` に対して
+`/home/<user>/vault/file/file/core/...` になる（`file/` がネスト）。
 
-正しくは `--strip-components=2` で `/home/yuki/vault/file/core/...` になる。
+正しくは `--strip-components=2` で `/home/<user>/vault/file/core/...` になる。
 
 ## 修正
 
@@ -31,6 +31,6 @@ source: personal
 
 ## 関連
 
-- MINIPC: `/home/yuki/scripts/vault-sync.sh`
+- MINIPC: `/home/<user>/scripts/vault-sync.sh`
 - vault-standby は再起動後に手動 unseal が必要（自動 unseal なし）
 - unseal keys: `gopass show cloud/sakura/vault/unseal-key-{1,2}`（しきい値 t=2）
