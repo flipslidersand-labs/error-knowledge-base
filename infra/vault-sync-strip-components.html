@@ -58,9 +58,9 @@
 <code>docker exec vault-standby ls /vault/file/core/</code> が空。</p>
 <h2>原因</h2>
 <p><code>docker exec vault-server tar -czf - /vault/file</code> は <code>/vault/file/core/...</code> 構造を出力する。</p>
-<p><code>--strip-components=1</code> では <code>vault/file/core/...</code> が展開先 <code>/home/yuki/vault/file/</code> に対して
-<code>/home/yuki/vault/file/file/core/...</code> になる（<code>file/</code> がネスト）。</p>
-<p>正しくは <code>--strip-components=2</code> で <code>/home/yuki/vault/file/core/...</code> になる。</p>
+<p><code>--strip-components=1</code> では <code>vault/file/core/...</code> が展開先 <code>/home/&lt;user&gt;/vault/file/</code> に対して
+<code>/home/&lt;user&gt;/vault/file/file/core/...</code> になる（<code>file/</code> がネスト）。</p>
+<p>正しくは <code>--strip-components=2</code> で <code>/home/&lt;user&gt;/vault/file/core/...</code> になる。</p>
 <h2>修正</h2>
 <div class="codehilite"><pre><span></span><code><span class="c1"># vault-sync.sh</span>
 <span class="p">|</span><span class="w"> </span>tar<span class="w"> </span>-xzf<span class="w"> </span>-<span class="w"> </span>--strip-components<span class="o">=</span><span class="m">2</span><span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">LOCAL_DST</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -69,7 +69,7 @@
 
 <h2>関連</h2>
 <ul>
-<li>MINIPC: <code>/home/yuki/scripts/vault-sync.sh</code></li>
+<li>MINIPC: <code>/home/&lt;user&gt;/scripts/vault-sync.sh</code></li>
 <li>vault-standby は再起動後に手動 unseal が必要（自動 unseal なし）</li>
 <li>unseal keys: <code>gopass show cloud/sakura/vault/unseal-key-{1,2}</code>（しきい値 t=2）</li>
 </ul>
