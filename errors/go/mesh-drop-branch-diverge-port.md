@@ -32,3 +32,8 @@ round11 ブランチで code-review した #207 等を実装するには先に�
 - `git checkout --ours` / `--theirs` 後は必ず `go build` + `go test` で確認
 - noise.go の `clear(pt)` → `zeroBytes` 変更時は `zeroBytes` 関数の存在確認
 - 同一ファイルに重複定義が生まれる場合（parseFingerprint 等）は `--ours` で回避し重複チェック
+
+## 予防
+
+- 長く生きるブランチは、master に基盤（本件では TLS フィンガープリント基盤）が追加された時点で master を取り込み、分岐が広がる前に追従する。
+- 別ブランチ向けの作業を始める前に、そのブランチが master の必要な基盤を持っているか確認する（無ければ先にポートする）。

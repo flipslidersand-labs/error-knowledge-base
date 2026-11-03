@@ -35,3 +35,8 @@ results = response.points  # .score / .payload を持つ
 
 - scripts/ingest/qdrant.py の search() 関数
 - qdrant サーバ: 1.18.2 (MINIPC <internal-host>:6333)
+
+## 予防
+
+- qdrant-client のバージョンを上げる前に、使用している API（`search()` 等）が廃止されていないか changelog で確認し、`query_points()` へ移行してから上げる。
+- クライアントのバージョンを固定（pin）し、サーバ（1.18.2）との組み合わせを本書の関連欄に残す。
