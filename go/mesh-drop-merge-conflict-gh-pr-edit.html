@@ -77,6 +77,11 @@ deprecation エラーが返ってくると exit 1 になる。</p>
 <li>発生リポ: flipslidersand-labs/mesh-drop</li>
 <li>日付: 2026-08-16</li>
 </ul>
+<h2>予防</h2>
+<ul>
+<li>PR のタイトル・本文の編集は、最初から <code>gh api --method PATCH repos/&lt;owner&gt;/&lt;repo&gt;/pulls/&lt;number&gt;</code>（REST）で行い、<code>gh pr edit</code> に頼らない。</li>
+<li>編集後は、実際に更新されたか（<code>--jq '.number,.title'</code> の出力）を確認する。exit 1 の場合は更新されていない。</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">

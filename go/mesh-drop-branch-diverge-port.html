@@ -77,6 +77,11 @@ round11 ブランチで code-review した #207 等を実装するには先に�
 <li>noise.go の <code>clear(pt)</code> → <code>zeroBytes</code> 変更時は <code>zeroBytes</code> 関数の存在確認</li>
 <li>同一ファイルに重複定義が生まれる場合（parseFingerprint 等）は <code>--ours</code> で回避し重複チェック</li>
 </ul>
+<h2>予防</h2>
+<ul>
+<li>長く生きるブランチは、master に基盤（本件では TLS フィンガープリント基盤）が追加された時点で master を取り込み、分岐が広がる前に追従する。</li>
+<li>別ブランチ向けの作業を始める前に、そのブランチが master の必要な基盤を持っているか確認する（無ければ先にポートする）。</li>
+</ul>
                 <div class="related-section">
             <h2>関連するエラー</h2>
             <ul class="related-list">
