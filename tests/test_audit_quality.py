@@ -30,9 +30,14 @@ def test_complete_entry_has_no_problems():
     assert audit(body) == []
 
 
-def test_missing_prevention_detected():
+def test_missing_prevention_is_allowed():
     body = f"## 症状\n{PAD}\n## 原因\n{PAD}\n## 解決策\n{PAD}\n"
-    assert audit(body) == ["missing:prevention"]
+    assert audit(body) == []
+
+
+def test_missing_cause_detected():
+    body = f"## 症状\n{PAD}\n## 解決策\n{PAD}\n## 予防\n{PAD}\n"
+    assert audit(body) == ["missing:cause"]
 
 
 def test_fix_under_subheadings_is_not_empty():
@@ -59,8 +64,8 @@ def test_cause_synonyms_condition_and_spec():
 
 
 def test_hash_inside_code_fence_is_not_heading():
-    body = f"## 症状\n```\n# 予防\n```\n{PAD}\n## 原因\n{PAD}\n## 解決策\n{PAD}\n"
-    assert audit(body) == ["missing:prevention"]
+    body = f"## 症状\n```\n# 原因\n```\n{PAD}\n## 解決策\n{PAD}\n"
+    assert audit(body) == ["missing:cause"]
 
 
 def test_fragment_without_headings():
