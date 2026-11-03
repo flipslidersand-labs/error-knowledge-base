@@ -38,3 +38,8 @@ gh api --method PATCH repos/<owner>/<repo>/pulls/<number> \
 - gh version: 2.x
 - 発生リポ: flipslidersand-labs/mesh-drop
 - 日付: 2026-08-16
+
+## 予防
+
+- PR のタイトル・本文の編集は、最初から `gh api --method PATCH repos/<owner>/<repo>/pulls/<number>`（REST）で行い、`gh pr edit` に頼らない。
+- 編集後は、実際に更新されたか（`--jq '.number,.title'` の出力）を確認する。exit 1 の場合は更新されていない。
