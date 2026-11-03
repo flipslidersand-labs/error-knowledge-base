@@ -50,3 +50,8 @@ org スコープ runner は全リポジトリで共有可能。
 
 - ARC version: 0.14.2 (gha-runner-scale-set chart)
 - Epic #854 CI Compute Platform
+
+## 予防
+
+- 個人アカウント（Organization 未作成）では、最初から `githubConfigUrl` を repo-level URL にするか、Organization を作成して org-level URL を使う。user-level URL は指定しない。
+- ARC を上げる際は、`/orgs/` 固定が解消されたか（user-level 登録に対応したか）を確認してから URL 方式を見直す。
