@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """errors/ の品質を決定的に測る(#129 第1段)。LLM は使わない。
 
-欠落: 必須項目(原因/対処/予防)の見出しが無い、または見出しの下が空
+欠落: 必須項目(原因/対処)の見出しが無い、または見出しの下が空(予防は任意)
 断片: 本文が短すぎる、見出しが1つも無い
 
 Usage: python3 scripts/audit_quality.py [--json] [--list]
@@ -18,6 +18,7 @@ from build import parse_frontmatter  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 MIN_BODY_CHARS = 200
 REQUIRED_META = ("title", "tags", "severity", "source")
+REQUIRED_SECTIONS = ("cause", "fix")  # prevention は任意(memory-store#77 / 方針A)
 
 # 見出し語の揺れを吸収する(実エントリの見出しから採取)
 SECTIONS = {
@@ -71,7 +72,8 @@ def audit_entry(path: Path) -> dict:
     if not sections:
         problems.append("fragment:no-headings")
 
-    for name, words in SECTIONS.items():
+    for name in REQUIRED_SECTIONS:
+        words = SECTIONS[name]
         hits = [c for h, c in sections if any(w in h.lower() for w in words)]
         if not hits:
             problems.append(f"missing:{name}")
