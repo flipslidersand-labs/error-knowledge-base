@@ -75,6 +75,11 @@
 <li>scripts/ingest/qdrant.py の search() 関数</li>
 <li>qdrant サーバ: 1.18.2 (MINIPC :6333)</li>
 </ul>
+<h2>予防</h2>
+<ul>
+<li>qdrant-client のバージョンを上げる前に、使用している API（<code>search()</code> 等）が廃止されていないか changelog で確認し、<code>query_points()</code> へ移行してから上げる。</li>
+<li>クライアントのバージョンを固定（pin）し、サーバ（1.18.2）との組み合わせを本書の関連欄に残す。</li>
+</ul>
         
     </div>
 </body>

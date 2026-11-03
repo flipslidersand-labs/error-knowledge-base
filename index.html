@@ -370,7 +370,7 @@
                 <span class="source-badge source-personal">実体験</span>
                 <span class="tag" style="cursor:pointer" onclick="filterByTag(this, &quot;go&quot;)">go</span>
             </div>
-            <div class="error-card" data-tags="go" data-title="gh pr edit が Projects (classic) 警告で exit 1 になる" data-text="gh pr edit が Projects (classic) 警告で exit 1 になる 症状 タイトル・本文は実際には更新されていない（API呼び出し自体が失敗している）。 原因 が Projects (classic) フィールドを取得する GraphQL クエリを内部で投げており、 deprecation エラーが返ってくると exit 1 になる。 回避策 REST API を直接叩く: 確認環境 gh version: 2.x 発生リポ: flipslidersand-labs/mesh-drop 日付: 2026-08-16">
+            <div class="error-card" data-tags="go" data-title="gh pr edit が Projects (classic) 警告で exit 1 になる" data-text="gh pr edit が Projects (classic) 警告で exit 1 になる 症状 タイトル・本文は実際には更新されていない（API呼び出し自体が失敗している）。 原因 が Projects (classic) フィールドを取得する GraphQL クエリを内部で投げており、 deprecation エラーが返ってくると exit 1 になる。 回避策 REST API を直接叩く: 確認環境 gh version: 2.x 発生リポ: flipslidersand-labs/mesh-drop 日付: 2026-08-16 予防 PR のタイトル・本文の編集は、最初から （REST）で行い、 に頼らない。 編集後は、実際に更新されたか（ の出力）を確認する。exit 1 の場合は更新されていない。">
                 <a href="go/mesh-drop-merge-conflict-gh-pr-edit.html">gh pr edit が Projects (classic) 警告で exit 1 になる</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
@@ -617,7 +617,7 @@
         </div>
         <div class="category">
             <h3>📁 RUNTIME</h3>
-            <div class="error-card" data-tags="runtime" data-title="qdrant-client 1.18 で client.search() が廃止" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC &lt;internal-host&gt;:6333)">
+            <div class="error-card" data-tags="runtime" data-title="qdrant-client 1.18 で client.search() が廃止" data-text="qdrant-client 1.18 で client.search() が廃止 **日付**: 2026-06-29 **カテゴリ**: Runtime / API変更 エラー 原因 qdrant-client &gt;= 1.18 で が廃止。 修正 関連 scripts/ingest/qdrant.py の search() 関数 qdrant サーバ: 1.18.2 (MINIPC &lt;internal-host&gt;:6333) 予防 qdrant-client のバージョンを上げる前に、使用している API（ 等）が廃止されていないか changelog で確認し、 へ移行してから上げる。 クライアントのバージョンを固定（pin）し、サーバ（1.18.2）との組み合わせを本書の関連欄に残す。">
                 <a href="runtime/qdrant-client-search-removed.html">qdrant-client 1.18 で client.search() が廃止</a>
                 <span class="severity severity-medium">medium</span>
                 <span class="source-badge source-personal">実体験</span>
@@ -879,7 +879,7 @@
             </div>
         </div>
         <footer>
-            <p>Last updated: 2026-11-01 14:27:04</p>
+            <p>Last updated: 2026-11-03 12:51:33</p>
             <p><a href="https://github.com/flipslidersand-labs/error-knowledge-base">GitHub Repository</a></p>
         </footer>
     </div>
