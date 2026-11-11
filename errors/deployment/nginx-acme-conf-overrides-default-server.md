@@ -13,7 +13,7 @@ date: "2026-08-03"
 
 ## 原因
 
-`acme.conf` が同じホスト名（`server_name os3-369-17699.vs.sakura.ne.jp`）で `listen 80` を持っており、
+`acme.conf` が同じホスト名（`server_name <vps-host>`）で `listen 80` を持っており、
 nginx の優先順位で `server_name` 完全一致ブロックが `default_server` より先にマッチする。
 `acme.conf` には `location /` が無いため、`/health` は 404 になっていた。
 
@@ -24,7 +24,7 @@ nginx の優先順位で `server_name` 完全一致ブロックが `default_serv
 ```nginx
 server {
     listen 80;
-    server_name os3-369-17699.vs.sakura.ne.jp;
+    server_name <vps-host>;
 
     location /.well-known/acme-challenge/ {
         root /var/www/acme-webroot;
