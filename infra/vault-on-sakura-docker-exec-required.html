@@ -58,7 +58,7 @@
 <p>VPS ホストには vault バイナリがインストールされていない。
 Vault は <code>vault-server</code> という Docker コンテナとして稼働しており、コンテナ内にのみバイナリがある。</p>
 <h2>解決策</h2>
-<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>ubuntu@<vps-host><span class="w"> </span><span class="se">\</span>
+<div class="codehilite"><pre><span></span><code>ssh<span class="w"> </span>&lt;user&gt;@&lt;vps-host&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span><span class="s2">&quot;docker exec vault-server env \</span>
 <span class="s2">    VAULT_ADDR=http://127.0.0.1:8200 \</span>
 <span class="s2">    VAULT_TOKEN=&lt;token&gt; \</span>
@@ -75,7 +75,7 @@ Vault は <code>vault-server</code> という Docker コンテナとして稼働
 <li><code>minipc-token</code> は権限が限定的（403 になる場合あり）。管理操作は <code>root-token</code> を使う</li>
 <li>ローカルから SSH トンネル経由で Vault に接続したい場合:
   <code>bash
-  ssh -L 8200:localhost:8200 ubuntu@<vps-host> -N &amp;
+  ssh -L 8200:localhost:8200 &lt;user&gt;@&lt;vps-host&gt; -N &amp;
   export VAULT_ADDR=http://127.0.0.1:8200
   vault kv get secret/infra/...</code></li>
 </ul>
