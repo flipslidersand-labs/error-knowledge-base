@@ -18,7 +18,7 @@ Vault は `vault-server` という Docker コンテナとして稼働してお�
 ## 解決策
 
 ```bash
-ssh ubuntu@<vps-host> \
+ssh <user>@<vps-host> \
   "docker exec vault-server env \
     VAULT_ADDR=http://127.0.0.1:8200 \
     VAULT_TOKEN=<token> \
@@ -37,7 +37,7 @@ ROOT_TOKEN=$(gopass show cloud/sakura/vault/root-token)
 - `minipc-token` は権限が限定的（403 になる場合あり）。管理操作は `root-token` を使う
 - ローカルから SSH トンネル経由で Vault に接続したい場合:
   ```bash
-  ssh -L 8200:localhost:8200 ubuntu@<vps-host> -N &
+  ssh -L 8200:localhost:8200 <user>@<vps-host> -N &
   export VAULT_ADDR=http://127.0.0.1:8200
   vault kv get secret/infra/...
   ```
