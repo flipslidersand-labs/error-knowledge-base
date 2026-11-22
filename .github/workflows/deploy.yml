@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   build-and-deploy:
-    runs-on: ${{ vars.GATE_RUNNER || 'ubuntu-latest' }}
+    # peaceiris/actions-gh-pages は $HOME に認証トークン入りの作業コピーを残すため、
+    # 常駐 self-hosted runner では使わない。GitHub ホスト runner(VM ごと破棄)に固定する(#171)。
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
